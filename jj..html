@@ -234,46 +234,79 @@
   </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-  const supabase = window.supabase.createClient("https://udmdtwdpeahthybwtlql.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkbWR0d2RwZWFodGh5Ynd0bHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDYzMDEsImV4cCI6MjA1OTYyMjMwMX0.RuQkRV55uV8flYP6xssQGL-YEFQs5hI-50mKdJFJtbY");
-  const cocToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjYxYTM5YWZmLTY4OTAtNDM4NC04MzJhLTRkNWFmODFhM2U4ZCIsImlhdCI6MTc0Mzc3MjEwNSwic3ViIjoiZGV2ZWxvcGVyLzM0ZDM2ZjAyLTY3MWQtYTRkNy05ODlhLTEwMGY2M2RmOGZiYyIsInNjb3BlcyI6WyJjbGFzaCJdLCJsaW1pdHMiOlt7InRpZXIiOiJkZXZlbG9wZXIvc2lsdmVyIiwidHlwZSI6InRocm90dGxpbmcifSx7ImNpZHJzIjpbIjQ5LjM2LjE4MS41NiJdLCJ0eXBlIjoiY2xpZW50In1dfQ.Zj01uK-sPZLDc56CXNvbhfzSmr3jAo5PoTnZG0JNjr1OuuYSyZeuCtw3_MY_FZbrhAoBCL10cnmgqHgLgiC84A";
+  const supabase = window.supabase.createClient(
+    "https://udmdtwdpeahthybwtlql.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkbWR0d2RwZWFodGh5Ynd0bHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDYzMDEsImV4cCI6MjA1OTYyMjMwMX0.RuQkRV55uV8flYP6xssQGL-YEFQs5hI-50mKdJFJtbY"
+  );
 
   async function trackDonations() {
-    const tagInput = document.getElementById("playerTag").value.trim();
-    if (!tagInput.startsWith("#")) {
-      alert("Please enter a valid player tag starting with #");
-      return;
-    }
+    let tagInput = document.getElementById("playerTag").value.trim().toUpperCase();
+    if (!tagInput.startsWith("#")) tagInput = "#" + tagInput;
+
     const encodedTag = encodeURIComponent(tagInput);
-
-    const res = await fetch(`https://server-coc.onrender.com/api/player/${encodedTag}`);
-
-    const data = await res.json();
     const today = new Date().toISOString().split("T")[0];
     const playerTag = tagInput;
-    const friendInNeed = data.achievements.find(a => a.name === "Friend in Need")?.value || 0;
 
-    const { data: yesterdayData } = await supabase
-      .from("daily_donations")
-      .select("donations")
-      .eq("player_tag", playerTag)
-      .lt("date", today)
-      .order("date", { ascending: false })
-      .limit(1);
+    try {
+      const res = await fetch(`https://server-coc.onrender.com/api/player/${encodedTag}`);
+      const data = await res.json();
 
-    const previous = yesterdayData?.[0]?.donations || 0;
-    const diff = friendInNeed - previous;
+      const friendInNeed = data.achievements.find(a => a.name === "Friend in Need")?.value || 0;
+      const sharingIsCaring = data.achievements.find(a => a.name === "Sharing is caring")?.value || 0;
+      const siegeSharer = data.achievements.find(a => a.name === "Siege Sharer")?.value || 0;
 
-    await supabase.from("daily_donations").upsert([{
-      player_tag: playerTag,
-      date: today,
-      donations: friendInNeed,
-      difference: diff
-    }], { onConflict: ['player_tag', 'date'] });
+      // XP formula
+      const totalXP = friendInNeed + sharingIsCaring * 5 + siegeSharer * 30;
 
-    document.getElementById("donationToday").innerText = `Today's "Friend in Need": ${friendInNeed}`;
-    document.getElementById("donationDifference").innerText = `Donated today: ${diff}`;
+      // Get yesterday's XP
+      const { data: prevData, error: selectError } = await supabase
+        .from("daily_donations")
+        .select("total_xp")
+        .eq("player_tag", playerTag)
+        .lt("date", today)
+        .order("date", { ascending: false })
+        .limit(1);
+
+      if (selectError) {
+        console.error("Select Error:", selectError.message, selectError.details);
+        alert("Failed to fetch previous data.");
+        return;
+      }
+
+      const prevXP = prevData?.[0]?.total_xp || 0;
+      const xpGainedToday = totalXP - prevXP;
+
+      // Upsert today's data
+      const { error: upsertError } = await supabase
+        .from("daily_donations")
+        .upsert([{
+          player_tag: playerTag,
+          date: today,
+          friend_in_need: friendInNeed,
+          sharing_is_caring: sharingIsCaring,
+          siege_sharer: siegeSharer,
+          total_xp: totalXP,
+          xp_gained_today: xpGainedToday,
+          donations: friendInNeed // Avoid NOT NULL error
+        }], { onConflict: ['player_tag', 'date'] });
+
+      if (upsertError) {
+        console.error("Upsert Error:", upsertError.message, upsertError.details);
+        alert("Failed to save donation data");
+        return;
+      }
+
+      // Display results
+      document.getElementById("donationToday").innerText = `XP Collected Today: ${xpGainedToday}`;
+      document.getElementById("donationDifference").innerText = `Friend in Need: ${friendInNeed}, Sharing is Caring: ${sharingIsCaring}, Siege Sharer: ${siegeSharer}`;
+    } catch (err) {
+      console.error("Unexpected Error:", err);
+      alert("Something went wrong while tracking donation");
+    }
   }
 </script>
+
+
 
 </body>
 </html>
