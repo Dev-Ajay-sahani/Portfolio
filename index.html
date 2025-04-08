@@ -111,6 +111,23 @@
    <p id="donationToday"></p>
    <p id="donationDifference"></p>
  </div> 
+ <h2>📅 Monthly Donation Summary</h2>
+<input type="text" id="monthlyTag" placeholder="Enter player tag e.g. #P8V8YRG99">
+<button onclick="loadMonthlyData()">Get Monthly Stats</button>
+
+<table border="1" id="monthlyStatsTable" style="margin-top: 15px; display: none;">
+  <thead>
+    <tr>
+      <th>Month</th>
+      <th>Friend in Need</th>
+      <th>Sharing is Caring</th>
+      <th>Siege Sharer</th>
+      <th>Total XP</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
   <h2>XP Required Per Level</h2>
   <input class="search-box" type="number" placeholder="Search level..." oninput="filterXPTable(this.value)">
   <div class="table-container">
@@ -128,6 +145,43 @@
       <tbody></tbody>
     </table>
   </div>
+  <script>
+    async function loadMonthlyData() {
+      let tag = document.getElementById("monthlyTag").value.trim().toUpperCase();
+      if (!tag.startsWith("#")) tag = "#" + tag;
+  
+      const { data, error } = await supabase.rpc("get_monthly_totals", { player_tag: tag });
+  
+      if (error) {
+        console.error("Error fetching monthly totals:", error);
+        alert("Could not fetch monthly data.");
+        return;
+      }
+  
+      const table = document.getElementById("monthlyStatsTable");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = ""; // clear previous
+  
+      if (data.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>No data found</td></tr>";
+      } else {
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${new Date(row.month).toLocaleDateString("en-GB", { year: 'numeric', month: 'long' })}</td>
+            <td>${row.total_friend_in_need}</td>
+            <td>${row.total_sharing_is_caring}</td>
+            <td>${row.total_siege_sharer}</td>
+            <td>${row.total_xp}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+  
+      table.style.display = "table";
+    }
+  </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
     function xpRequired(level) {
