@@ -351,7 +351,7 @@
       }
 
       // Display results
-      document.getElementById("donationToday").innerText = `XP Collected Today(Note:For New User It Takes One day to track): ${xpGainedToday}`;
+      document.getElementById("donationToday").innerText = `(Note:For New User It Takes One day to track) \n XP Collected Today: ${xpGainedToday}`;
       document.getElementById("donationDifference").innerText = `Friend in Need: ${friendInNeed}, Sharing is Caring: ${sharingIsCaring}, Siege Sharer: ${siegeSharer}`;
     } catch (err) {
       console.error("Unexpected Error:", err);
