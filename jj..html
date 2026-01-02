@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Vault - Google Drive Hosting</title>
+    <title>PDF Vault - Document Library</title>
     <style>
         * {
             margin: 0;
@@ -29,53 +29,116 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: var(--text-light);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
-        .container {
+        /* Floating Admin Button */
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 0.9em;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .admin-btn.logged-in {
+            background: var(--success);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 1200px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
         }
 
-        .hidden {
-            display: none !important;
+        .modal-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Login Page */
-        .login-container {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Login Modal */
+        .login-modal {
             background: var(--bg-light);
             border-radius: 20px;
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            max-width: 450px;
-            margin: 0 auto;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
             border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: slideUp 0.3s ease;
         }
 
-        .login-header {
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--text-light);
+        }
+
+        .modal-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .login-header h1 {
-            font-size: 2.5em;
+        .modal-header h2 {
+            font-size: 1.8em;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .login-header p {
+        .modal-header p {
             color: var(--text-gray);
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -88,19 +151,19 @@
 
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: var(--bg-dark);
             border: 2px solid var(--border);
             border-radius: 10px;
             color: var(--text-light);
-            font-size: 1em;
+            font-size: 0.95em;
             transition: all 0.3s ease;
             font-family: inherit;
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 80px;
         }
 
         .form-group input:focus, .form-group textarea:focus {
@@ -111,10 +174,10 @@
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: none;
             border-radius: 10px;
-            font-size: 1em;
+            font-size: 0.95em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -127,29 +190,24 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
         }
 
         .btn-danger {
             background: var(--danger);
             color: white;
+            margin-top: 10px;
         }
 
         .btn-danger:hover {
             background: #dc2626;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
         }
 
         .error-message, .success-message {
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-size: 0.85em;
             display: none;
         }
 
@@ -165,221 +223,218 @@
             color: var(--success);
         }
 
-        /* Dashboard */
-        .dashboard {
-            display: none;
-        }
-
-        .dashboard.active {
-            display: block;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding: 30px;
-            background: var(--bg-light);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-        }
-
-        .dashboard-header h1 {
-            font-size: 2em;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .user-info {
-            color: var(--text-gray);
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn-small {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        /* Add PDF Section */
-        .add-section {
-            background: var(--bg-light);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 40px;
-            border: 1px solid var(--border);
-        }
-
-        .add-section h2 {
-            margin-bottom: 25px;
-            color: var(--text-light);
-            font-size: 1.5em;
-        }
-
         .help-text {
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid var(--primary);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
             color: var(--text-gray);
         }
 
         .help-text strong {
             color: var(--text-light);
             display: block;
-            margin-bottom: 8px;
-        }
-
-        .help-text ol {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
-        .help-text li {
             margin-bottom: 5px;
         }
 
-        /* PDF List */
-        .pdf-list {
-            background: var(--bg-light);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid var(--border);
+        .help-text ol {
+            margin-left: 18px;
+            margin-top: 8px;
         }
 
-        .pdf-list h2 {
-            margin-bottom: 25px;
-            color: var(--text-light);
-            font-size: 1.5em;
+        .help-text li {
+            margin-bottom: 3px;
         }
 
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-gray);
+            font-size: 1.1em;
+        }
+
+        /* PDF Grid */
         .pdf-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px;
         }
 
         .pdf-card {
-            background: var(--bg-dark);
+            background: var(--bg-light);
             border-radius: 15px;
-            padding: 25px;
+            padding: 30px;
             border: 1px solid var(--border);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .pdf-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             border-color: var(--primary);
         }
 
         .pdf-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-align: center;
             color: var(--primary);
         }
 
         .pdf-name {
             font-weight: 600;
-            margin-bottom: 10px;
+            font-size: 1.2em;
+            margin-bottom: 12px;
             color: var(--text-light);
             word-break: break-word;
         }
 
-        .pdf-info {
+        .pdf-description {
+            color: var(--text-gray);
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .pdf-date {
             font-size: 0.85em;
             color: var(--text-gray);
-            margin-bottom: 15px;
-        }
-
-        .pdf-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-view {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-view:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #dc2626;
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 100px 20px;
             color: var(--text-gray);
+            grid-column: 1 / -1;
         }
 
         .empty-state-icon {
-            font-size: 4em;
+            font-size: 5em;
             margin-bottom: 20px;
             opacity: 0.5;
         }
 
+        .empty-state p {
+            font-size: 1.2em;
+        }
+
+        /* Admin Panel Tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .pdf-list-item {
+            background: var(--bg-dark);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pdf-list-info {
+            flex: 1;
+        }
+
+        .pdf-list-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .pdf-list-desc {
+            font-size: 0.85em;
+            color: var(--text-gray);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85em;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: #dc2626;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .login-container {
-                padding: 30px;
+            .admin-btn {
+                top: 10px;
+                right: 10px;
+                padding: 10px 20px;
+                font-size: 0.85em;
             }
 
-            .dashboard-header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-
-            .header-actions {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .add-section, .pdf-list {
-                padding: 25px;
+            .header h1 {
+                font-size: 2em;
             }
 
             .pdf-grid {
                 grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .login-modal {
+                padding: 30px;
             }
         }
 
-        @keyframes fadeIn {
+        @keyframes cardEntry {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -391,159 +446,197 @@
         }
 
         .pdf-card {
-            animation: fadeIn 0.5s ease;
+            animation: cardEntry 0.5s ease;
         }
     </style>
 </head>
 <body>
+    <!-- Floating Admin Button -->
+    <button class="admin-btn" id="adminBtn" onclick="openAdminModal()">
+        🔐 Admin Login
+    </button>
+
+    <!-- Main Content -->
     <div class="container">
-        <!-- Login Page -->
-        <div id="loginPage" class="login-container">
-            <div class="login-header">
-                <h1>📚 PDF Vault</h1>
-                <p>Google Drive PDF Management</p>
-            </div>
-            <div id="errorMessage" class="error-message"></div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
+        <div class="header">
+            <h1>📚 PDF Document Library</h1>
+            <p>Browse and view available PDF documents</p>
         </div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="dashboard">
-            <div class="dashboard-header">
-                <div>
-                    <h1>📚 PDF Vault Dashboard</h1>
-                    <div class="user-info">Logged in as: <strong id="currentUser"></strong></div>
-                </div>
-                <div class="header-actions">
-                    <button onclick="scrollToAdd()" class="btn-small btn-success">➕ Add PDF Link</button>
-                    <button onclick="logout()" class="btn-small btn-danger">🚪 Logout</button>
-                </div>
+        <div class="pdf-grid" id="pdfGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p>No documents available yet</p>
             </div>
+        </div>
+    </div>
 
-            <!-- Add PDF Section -->
-            <div class="add-section">
-                <h2>➕ Add Google Drive PDF</h2>
-                <div id="successMessage" class="success-message"></div>
-                
-                <div class="help-text">
-                    <strong>📋 How to get Google Drive link:</strong>
-                    <ol>
-                        <li>Upload your PDF to Google Drive</li>
-                        <li>Right-click the PDF → Click "Share"</li>
-                        <li>Change access to "Anyone with the link"</li>
-                        <li>Click "Copy link" and paste below</li>
-                    </ol>
+    <!-- Login/Admin Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="login-modal" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="modal-header">
+                    <h2>🔐 Admin Login</h2>
+                    <p>Enter credentials to manage PDFs</p>
                 </div>
-
-                <form id="addPdfForm">
+                <div id="loginError" class="error-message"></div>
+                <form onsubmit="handleLogin(event)">
                     <div class="form-group">
-                        <label for="pdfName">PDF Name</label>
-                        <input type="text" id="pdfName" placeholder="Enter PDF name (e.g., Project Report)" required>
+                        <label>Username</label>
+                        <input type="text" id="username" required autocomplete="username">
                     </div>
                     <div class="form-group">
-                        <label for="pdfUrl">Google Drive Link</label>
-                        <input type="url" id="pdfUrl" placeholder="https://drive.google.com/file/d/..." required>
+                        <label>Password</label>
+                        <input type="password" id="password" required autocomplete="current-password">
                     </div>
-                    <div class="form-group">
-                        <label for="pdfDescription">Description (Optional)</label>
-                        <textarea id="pdfDescription" placeholder="Brief description of the PDF..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add PDF</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </form>
             </div>
 
-            <!-- PDF List -->
-            <div class="pdf-list">
-                <h2>📁 Your PDFs (<span id="pdfCount">0</span>)</h2>
-                <div class="pdf-grid" id="pdfGrid">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <p>No PDFs added yet. Add your first Google Drive link!</p>
-                    </div>
+            <!-- Admin Panel -->
+            <div id="adminPanel" style="display: none;">
+                <div class="modal-header">
+                    <h2>⚙️ Admin Panel</h2>
+                    <p>Manage PDF documents</p>
                 </div>
+
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="switchTab('add')">➕ Add PDF</button>
+                    <button class="tab-btn" onclick="switchTab('manage')">📋 Manage</button>
+                </div>
+
+                <!-- Add PDF Tab -->
+                <div id="addTab" class="tab-content active">
+                    <div id="addSuccess" class="success-message"></div>
+                    
+                    <div class="help-text">
+                        <strong>📋 How to add PDF:</strong>
+                        <ol>
+                            <li>Upload PDF to Google Drive</li>
+                            <li>Right-click → Share → "Anyone with link"</li>
+                            <li>Copy link and paste below</li>
+                        </ol>
+                    </div>
+
+                    <form onsubmit="handleAddPDF(event)">
+                        <div class="form-group">
+                            <label>PDF Name</label>
+                            <input type="text" id="pdfName" placeholder="e.g., Annual Report 2024" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Google Drive Link</label>
+                            <input type="url" id="pdfUrl" placeholder="https://drive.google.com/file/d/..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description (Optional)</label>
+                            <textarea id="pdfDescription" placeholder="Brief description..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add PDF</button>
+                    </form>
+                </div>
+
+                <!-- Manage PDFs Tab -->
+                <div id="manageTab" class="tab-content">
+                    <div id="pdfList"></div>
+                </div>
+
+                <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Admin Credentials
         const ADMIN_USERNAME = 'ajay2003';
         const ADMIN_PASSWORD = '03062003';
-
-        // Storage Key
         const STORAGE_KEY = 'pdfVaultLinks';
 
-        // Check authentication
+        let isLoggedIn = false;
+
+        // Load PDFs on page load
         window.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('pdfVaultAuth') === 'true') {
-                const username = sessionStorage.getItem('pdfVaultUser');
-                showDashboard(username);
-            }
+            loadPublicPDFs();
         });
 
-        // Login Handler
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+        function openAdminModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            if (isLoggedIn) {
+                showAdminPanel();
+            }
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
 
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                sessionStorage.setItem('pdfVaultAuth', 'true');
-                sessionStorage.setItem('pdfVaultUser', username);
-                showDashboard(username);
+                isLoggedIn = true;
+                showAdminPanel();
+                updateAdminButton();
             } else {
-                showError('Invalid username or password');
+                showMessage('loginError', 'Invalid credentials');
             }
-        });
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => errorDiv.style.display = 'none', 4000);
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            setTimeout(() => successDiv.style.display = 'none', 4000);
+        function showAdminPanel() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadManageList();
         }
 
-        function showDashboard(username) {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboard').classList.add('active');
-            document.getElementById('currentUser').textContent = username;
-            loadPDFs();
+        function handleLogout() {
+            isLoggedIn = false;
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            updateAdminButton();
+            closeModal();
         }
 
-        function logout() {
-            sessionStorage.clear();
-            location.reload();
+        function updateAdminButton() {
+            const btn = document.getElementById('adminBtn');
+            if (isLoggedIn) {
+                btn.textContent = '⚙️ Admin Panel';
+                btn.classList.add('logged-in');
+            } else {
+                btn.textContent = '🔐 Admin Login';
+                btn.classList.remove('logged-in');
+            }
         }
 
-        // Add PDF Form Handler
-        document.getElementById('addPdfForm').addEventListener('submit', (e) => {
-            e.preventDefault();
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'add') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('addTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('manageTab').classList.add('active');
+                loadManageList();
+            }
+        }
+
+        function handleAddPDF(event) {
+            event.preventDefault();
             
             const name = document.getElementById('pdfName').value.trim();
             const url = document.getElementById('pdfUrl').value.trim();
             const description = document.getElementById('pdfDescription').value.trim();
 
-            // Convert Google Drive URL to embeddable format
             const fileId = extractFileId(url);
             if (!fileId) {
-                showError('Invalid Google Drive link. Please check and try again.');
+                showMessage('addSuccess', 'Invalid Google Drive link', true);
                 return;
             }
 
@@ -553,19 +646,20 @@
                 url: url,
                 embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
                 description: description,
-                addedDate: new Date().toISOString(),
-                addedBy: sessionStorage.getItem('pdfVaultUser')
+                addedDate: new Date().toISOString()
             };
 
             savePDF(pdfData);
             
-            // Reset form
-            document.getElementById('addPdfForm').reset();
-            showSuccess(`"${name}" added successfully!`);
-        });
+            document.getElementById('pdfName').value = '';
+            document.getElementById('pdfUrl').value = '';
+            document.getElementById('pdfDescription').value = '';
+            
+            showMessage('addSuccess', `"${name}" added successfully!`);
+            loadPublicPDFs();
+        }
 
         function extractFileId(url) {
-            // Extract file ID from various Google Drive URL formats
             const patterns = [
                 /\/file\/d\/([a-zA-Z0-9_-]+)/,
                 /id=([a-zA-Z0-9_-]+)/,
@@ -583,56 +677,68 @@
             let pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             pdfs.unshift(pdfData);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
-            loadPDFs();
         }
 
-        function loadPDFs() {
+        function loadPublicPDFs() {
             const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const pdfGrid = document.getElementById('pdfGrid');
-            const pdfCount = document.getElementById('pdfCount');
-
-            pdfCount.textContent = pdfs.length;
+            const grid = document.getElementById('pdfGrid');
 
             if (pdfs.length === 0) {
-                pdfGrid.innerHTML = `
+                grid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
-                        <p>No PDFs added yet. Add your first Google Drive link!</p>
+                        <p>No documents available yet</p>
                     </div>
                 `;
                 return;
             }
 
-            pdfGrid.innerHTML = pdfs.map(pdf => `
-                <div class="pdf-card">
+            grid.innerHTML = pdfs.map(pdf => `
+                <div class="pdf-card" onclick="window.open('${pdf.embedUrl}', '_blank')">
                     <div class="pdf-icon">📄</div>
                     <div class="pdf-name">${escapeHtml(pdf.name)}</div>
-                    <div class="pdf-info">
-                        ${pdf.description ? escapeHtml(pdf.description) + '<br>' : ''}
-                        Added: ${formatDate(pdf.addedDate)}<br>
-                        <small>By: ${escapeHtml(pdf.addedBy)}</small>
-                    </div>
-                    <div class="pdf-actions">
-                        <button class="btn-action btn-view" onclick="viewPDF('${pdf.embedUrl}')">👁️ View</button>
-                        <button class="btn-action btn-delete" onclick="deletePDF(${pdf.id})">🗑️ Delete</button>
-                    </div>
+                    ${pdf.description ? `<div class="pdf-description">${escapeHtml(pdf.description)}</div>` : ''}
+                    <div class="pdf-date">Added: ${formatDate(pdf.addedDate)}</div>
                 </div>
             `).join('');
         }
 
-        function viewPDF(embedUrl) {
-            window.open(embedUrl, '_blank');
+        function loadManageList() {
+            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const list = document.getElementById('pdfList');
+
+            if (pdfs.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-gray);">No PDFs added yet</p>';
+                return;
+            }
+
+            list.innerHTML = pdfs.map(pdf => `
+                <div class="pdf-list-item">
+                    <div class="pdf-list-info">
+                        <div class="pdf-list-name">${escapeHtml(pdf.name)}</div>
+                        <div class="pdf-list-desc">${pdf.description || 'No description'}</div>
+                    </div>
+                    <button class="btn-small" onclick="deletePDF(${pdf.id})">Delete</button>
+                </div>
+            `).join('');
         }
 
         function deletePDF(id) {
-            if (!confirm('Are you sure you want to delete this PDF link?')) return;
+            if (!confirm('Delete this PDF?')) return;
 
             let pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             pdfs = pdfs.filter(pdf => pdf.id !== id);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
             
-            showSuccess('PDF deleted successfully!');
-            loadPDFs();
+            loadPublicPDFs();
+            loadManageList();
+        }
+
+        function showMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 4000);
         }
 
         function formatDate(dateString) {
@@ -648,10 +754,6 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function scrollToAdd() {
-            document.querySelector('.add-section').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
