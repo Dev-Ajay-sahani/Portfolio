@@ -24,14 +24,16 @@
             --border: #334155;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-dark);
             color: var(--text-light);
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
         }
 
         /* Floating Admin Button */
@@ -61,11 +63,106 @@
             background: var(--success);
         }
 
-        /* PDF Viewer Container */
-        .pdf-viewer-container {
+        /* View Toggle Button */
+        .view-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: var(--bg-light);
+            color: var(--text-light);
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 0.85em;
+        }
+
+        .view-toggle:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        /* PDF Grid Container */
+        .pdf-grid-container {
             width: 100%;
             height: 100vh;
+            display: grid;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-dark);
+        }
+
+        /* Grid layouts based on PDF count */
+        .pdf-grid-container.grid-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .pdf-grid-container.grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .pdf-grid-container.grid-3 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .pdf-grid-container.grid-4 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .pdf-grid-container.grid-5,
+        .pdf-grid-container.grid-6 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .pdf-grid-container.grid-7,
+        .pdf-grid-container.grid-8,
+        .pdf-grid-container.grid-9 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        /* Single View */
+        .pdf-grid-container.single-view {
+            grid-template-columns: 1fr;
+            padding: 0;
+            gap: 0;
+        }
+
+        .pdf-viewer-wrapper {
             position: relative;
+            background: var(--bg-light);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+        }
+
+        .pdf-grid-container.single-view .pdf-viewer-wrapper {
+            border-radius: 0;
+            border: none;
+        }
+
+        .pdf-viewer-wrapper .pdf-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 10;
+            border-bottom: 1px solid var(--border);
+            display: none;
+        }
+
+        .pdf-grid-container:not(.single-view) .pdf-viewer-wrapper .pdf-title {
+            display: block;
         }
 
         .pdf-iframe {
@@ -74,6 +171,7 @@
             border: none;
         }
 
+        /* Empty State */
         .no-pdf-message {
             display: flex;
             flex-direction: column;
@@ -94,50 +192,6 @@
             color: var(--text-gray);
             text-align: center;
             padding: 0 20px;
-        }
-
-        /* PDF Selector (when multiple PDFs) */
-        .pdf-selector {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-light);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 15px 25px;
-            display: none;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            max-width: 90%;
-        }
-
-        .pdf-selector.active {
-            display: flex;
-        }
-
-        .pdf-selector select {
-            padding: 10px 15px;
-            background: var(--bg-dark);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-light);
-            font-size: 0.95em;
-            cursor: pointer;
-            min-width: 200px;
-        }
-
-        .pdf-selector select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .pdf-selector label {
-            color: var(--text-gray);
-            font-weight: 600;
-            font-size: 0.9em;
         }
 
         /* Modal Overlay */
@@ -415,17 +469,30 @@
                 font-size: 0.85em;
             }
 
+            .view-toggle {
+                top: 60px;
+                left: 10px;
+                font-size: 0.8em;
+                padding: 8px 16px;
+            }
+
             .login-modal {
                 padding: 30px 20px;
             }
 
-            .pdf-selector {
-                flex-direction: column;
-                gap: 10px;
+            .pdf-grid-container.grid-3,
+            .pdf-grid-container.grid-4,
+            .pdf-grid-container.grid-5,
+            .pdf-grid-container.grid-6 {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
             }
 
-            .pdf-selector select {
-                width: 100%;
+            .pdf-grid-container.grid-7,
+            .pdf-grid-container.grid-8,
+            .pdf-grid-container.grid-9 {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
             }
         }
     </style>
@@ -436,19 +503,17 @@
         🔐 Admin
     </button>
 
-    <!-- PDF Viewer -->
-    <div class="pdf-viewer-container" id="pdfViewerContainer">
+    <!-- View Toggle Button -->
+    <button class="view-toggle" id="viewToggle" onclick="toggleView()" style="display: none;">
+        📄 Single View
+    </button>
+
+    <!-- PDF Grid Container -->
+    <div class="pdf-grid-container single-view" id="pdfGridContainer">
         <div class="no-pdf-message">
             <div class="no-pdf-icon">📭</div>
-            <div class="no-pdf-text">No PDF available yet.<br>Admin can add documents from the top-right corner.</div>
+            <div class="no-pdf-text">No PDFs available yet.<br>Admin can add documents from the top-right corner.</div>
         </div>
-    </div>
-
-    <!-- PDF Selector (for multiple PDFs) -->
-    <div class="pdf-selector" id="pdfSelector">
-        <label>📄 Select Document:</label>
-        <select id="pdfSelect" onchange="changePDF()">
-        </select>
     </div>
 
     <!-- Login/Admin Modal -->
@@ -534,53 +599,78 @@
         const STORAGE_KEY = 'pdfVaultLinks';
 
         let isLoggedIn = false;
-        let currentPDFIndex = 0;
+        let isGridView = false;
 
-        // Load and display PDF on page load
+        // Load and display PDFs on page load
         window.addEventListener('DOMContentLoaded', () => {
-            loadAndDisplayPDF();
+            loadAndDisplayPDFs();
         });
 
-        function loadAndDisplayPDF() {
+        function loadAndDisplayPDFs() {
             const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const container = document.getElementById('pdfViewerContainer');
-            const selector = document.getElementById('pdfSelector');
+            const container = document.getElementById('pdfGridContainer');
+            const toggleBtn = document.getElementById('viewToggle');
 
             if (pdfs.length === 0) {
                 container.innerHTML = `
                     <div class="no-pdf-message">
                         <div class="no-pdf-icon">📭</div>
-                        <div class="no-pdf-text">No PDF available yet.<br>Admin can add documents from the top-right corner.</div>
+                        <div class="no-pdf-text">No PDFs available yet.<br>Admin can add documents from the top-right corner.</div>
                     </div>
                 `;
-                selector.classList.remove('active');
+                container.className = 'pdf-grid-container single-view';
+                toggleBtn.style.display = 'none';
                 return;
             }
 
-            // Display current PDF
-            displayPDF(pdfs[currentPDFIndex].embedUrl);
-
-            // Show selector if multiple PDFs
+            // Show toggle button if more than 1 PDF
             if (pdfs.length > 1) {
-                const select = document.getElementById('pdfSelect');
-                select.innerHTML = pdfs.map((pdf, index) => 
-                    `<option value="${index}" ${index === currentPDFIndex ? 'selected' : ''}>${escapeHtml(pdf.name)}</option>`
-                ).join('');
-                selector.classList.add('active');
+                toggleBtn.style.display = 'block';
+                updateToggleButton();
             } else {
-                selector.classList.remove('active');
+                toggleBtn.style.display = 'none';
+                isGridView = false;
+            }
+
+            // Set grid class based on PDF count and view mode
+            if (isGridView && pdfs.length > 1) {
+                container.className = `pdf-grid-container grid-${Math.min(pdfs.length, 9)}`;
+            } else {
+                container.className = 'pdf-grid-container single-view';
+            }
+
+            // Display PDFs
+            if (isGridView && pdfs.length > 1) {
+                // Grid view - show all PDFs
+                container.innerHTML = pdfs.map(pdf => `
+                    <div class="pdf-viewer-wrapper">
+                        <div class="pdf-title">${escapeHtml(pdf.name)}</div>
+                        <iframe class="pdf-iframe" src="${pdf.embedUrl}" allowfullscreen></iframe>
+                    </div>
+                `).join('');
+            } else {
+                // Single view - show first PDF
+                container.innerHTML = `
+                    <div class="pdf-viewer-wrapper">
+                        <iframe class="pdf-iframe" src="${pdfs[0].embedUrl}" allowfullscreen></iframe>
+                    </div>
+                `;
             }
         }
 
-        function displayPDF(embedUrl) {
-            const container = document.getElementById('pdfViewerContainer');
-            container.innerHTML = `<iframe class="pdf-iframe" src="${embedUrl}" allowfullscreen></iframe>`;
+        function toggleView() {
+            isGridView = !isGridView;
+            updateToggleButton();
+            loadAndDisplayPDFs();
         }
 
-        function changePDF() {
-            currentPDFIndex = parseInt(document.getElementById('pdfSelect').value);
-            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            displayPDF(pdfs[currentPDFIndex].embedUrl);
+        function updateToggleButton() {
+            const btn = document.getElementById('viewToggle');
+            if (isGridView) {
+                btn.textContent = '📄 Single View';
+            } else {
+                btn.textContent = '🔲 Grid View';
+            }
         }
 
         function openAdminModal() {
@@ -679,7 +769,7 @@
             document.getElementById('pdfDescription').value = '';
             
             showMessage('addSuccess', `"${name}" added successfully!`);
-            loadAndDisplayPDF();
+            loadAndDisplayPDFs();
         }
 
         function extractFileId(url) {
@@ -729,8 +819,7 @@
             pdfs = pdfs.filter(pdf => pdf.id !== id);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
             
-            currentPDFIndex = 0;
-            loadAndDisplayPDF();
+            loadAndDisplayPDFs();
             loadManageList();
         }
 
