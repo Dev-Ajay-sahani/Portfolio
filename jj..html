@@ -26,10 +26,12 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: var(--bg-dark);
             color: var(--text-light);
-            min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
         }
 
         /* Floating Admin Button */
@@ -59,6 +61,85 @@
             background: var(--success);
         }
 
+        /* PDF Viewer Container */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .pdf-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .no-pdf-message {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .no-pdf-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-pdf-text {
+            font-size: 1.3em;
+            color: var(--text-gray);
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        /* PDF Selector (when multiple PDFs) */
+        .pdf-selector {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px 25px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            max-width: 90%;
+        }
+
+        .pdf-selector.active {
+            display: flex;
+        }
+
+        .pdf-selector select {
+            padding: 10px 15px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 0.95em;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .pdf-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .pdf-selector label {
+            color: var(--text-gray);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
         /* Modal Overlay */
         .modal-overlay {
             display: none;
@@ -67,7 +148,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 2000;
             backdrop-filter: blur(5px);
         }
@@ -89,12 +170,14 @@
             background: var(--bg-light);
             border-radius: 20px;
             padding: 40px;
-            max-width: 400px;
+            max-width: 450px;
             width: 90%;
             border: 1px solid var(--border);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
             animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes slideUp {
@@ -248,100 +331,7 @@
             margin-bottom: 3px;
         }
 
-        /* Main Content */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 20px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: var(--text-gray);
-            font-size: 1.1em;
-        }
-
-        /* PDF Grid */
-        .pdf-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 20px;
-        }
-
-        .pdf-card {
-            background: var(--bg-light);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .pdf-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            border-color: var(--primary);
-        }
-
-        .pdf-icon {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--primary);
-        }
-
-        .pdf-name {
-            font-weight: 600;
-            font-size: 1.2em;
-            margin-bottom: 12px;
-            color: var(--text-light);
-            word-break: break-word;
-        }
-
-        .pdf-description {
-            color: var(--text-gray);
-            font-size: 0.9em;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .pdf-date {
-            font-size: 0.85em;
-            color: var(--text-gray);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 100px 20px;
-            color: var(--text-gray);
-            grid-column: 1 / -1;
-        }
-
-        .empty-state-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            font-size: 1.2em;
-        }
-
-        /* Admin Panel Tabs */
+        /* Admin Tabs */
         .admin-tabs {
             display: flex;
             gap: 10px;
@@ -357,6 +347,7 @@
             color: var(--text-gray);
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9em;
         }
 
         .tab-btn.active {
@@ -381,15 +372,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
         .pdf-list-info {
             flex: 1;
+            min-width: 0;
         }
 
         .pdf-list-name {
             font-weight: 600;
             margin-bottom: 5px;
+            word-break: break-word;
         }
 
         .pdf-list-desc {
@@ -405,6 +399,7 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .btn-small:hover {
@@ -420,55 +415,40 @@
                 font-size: 0.85em;
             }
 
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .pdf-grid {
-                grid-template-columns: 1fr;
-                padding: 10px;
-            }
-
             .login-modal {
-                padding: 30px;
+                padding: 30px 20px;
             }
-        }
 
-        @keyframes cardEntry {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            .pdf-selector {
+                flex-direction: column;
+                gap: 10px;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
-        .pdf-card {
-            animation: cardEntry 0.5s ease;
+            .pdf-selector select {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Floating Admin Button -->
     <button class="admin-btn" id="adminBtn" onclick="openAdminModal()">
-        🔐 Admin Login
+        🔐 Admin
     </button>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="header">
-            <h1>📚 PDF Document Library</h1>
-            <p>Browse and view available PDF documents</p>
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer-container" id="pdfViewerContainer">
+        <div class="no-pdf-message">
+            <div class="no-pdf-icon">📭</div>
+            <div class="no-pdf-text">No PDF available yet.<br>Admin can add documents from the top-right corner.</div>
         </div>
+    </div>
 
-        <div class="pdf-grid" id="pdfGrid">
-            <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <p>No documents available yet</p>
-            </div>
-        </div>
+    <!-- PDF Selector (for multiple PDFs) -->
+    <div class="pdf-selector" id="pdfSelector">
+        <label>📄 Select Document:</label>
+        <select id="pdfSelect" onchange="changePDF()">
+        </select>
     </div>
 
     <!-- Login/Admin Modal -->
@@ -504,7 +484,7 @@
                 </div>
 
                 <div class="admin-tabs">
-                    <button class="tab-btn active" onclick="switchTab('add')">➕ Add PDF</button>
+                    <button class="tab-btn active" onclick="switchTab('add')">➕ Add</button>
                     <button class="tab-btn" onclick="switchTab('manage')">📋 Manage</button>
                 </div>
 
@@ -554,11 +534,54 @@
         const STORAGE_KEY = 'pdfVaultLinks';
 
         let isLoggedIn = false;
+        let currentPDFIndex = 0;
 
-        // Load PDFs on page load
+        // Load and display PDF on page load
         window.addEventListener('DOMContentLoaded', () => {
-            loadPublicPDFs();
+            loadAndDisplayPDF();
         });
+
+        function loadAndDisplayPDF() {
+            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const container = document.getElementById('pdfViewerContainer');
+            const selector = document.getElementById('pdfSelector');
+
+            if (pdfs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-pdf-message">
+                        <div class="no-pdf-icon">📭</div>
+                        <div class="no-pdf-text">No PDF available yet.<br>Admin can add documents from the top-right corner.</div>
+                    </div>
+                `;
+                selector.classList.remove('active');
+                return;
+            }
+
+            // Display current PDF
+            displayPDF(pdfs[currentPDFIndex].embedUrl);
+
+            // Show selector if multiple PDFs
+            if (pdfs.length > 1) {
+                const select = document.getElementById('pdfSelect');
+                select.innerHTML = pdfs.map((pdf, index) => 
+                    `<option value="${index}" ${index === currentPDFIndex ? 'selected' : ''}>${escapeHtml(pdf.name)}</option>`
+                ).join('');
+                selector.classList.add('active');
+            } else {
+                selector.classList.remove('active');
+            }
+        }
+
+        function displayPDF(embedUrl) {
+            const container = document.getElementById('pdfViewerContainer');
+            container.innerHTML = `<iframe class="pdf-iframe" src="${embedUrl}" allowfullscreen></iframe>`;
+        }
+
+        function changePDF() {
+            currentPDFIndex = parseInt(document.getElementById('pdfSelect').value);
+            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            displayPDF(pdfs[currentPDFIndex].embedUrl);
+        }
 
         function openAdminModal() {
             document.getElementById('modalOverlay').classList.add('active');
@@ -605,10 +628,10 @@
         function updateAdminButton() {
             const btn = document.getElementById('adminBtn');
             if (isLoggedIn) {
-                btn.textContent = '⚙️ Admin Panel';
+                btn.textContent = '⚙️ Panel';
                 btn.classList.add('logged-in');
             } else {
-                btn.textContent = '🔐 Admin Login';
+                btn.textContent = '🔐 Admin';
                 btn.classList.remove('logged-in');
             }
         }
@@ -656,7 +679,7 @@
             document.getElementById('pdfDescription').value = '';
             
             showMessage('addSuccess', `"${name}" added successfully!`);
-            loadPublicPDFs();
+            loadAndDisplayPDF();
         }
 
         function extractFileId(url) {
@@ -675,32 +698,8 @@
 
         function savePDF(pdfData) {
             let pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            pdfs.unshift(pdfData);
+            pdfs.push(pdfData);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
-        }
-
-        function loadPublicPDFs() {
-            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const grid = document.getElementById('pdfGrid');
-
-            if (pdfs.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <p>No documents available yet</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = pdfs.map(pdf => `
-                <div class="pdf-card" onclick="window.open('${pdf.embedUrl}', '_blank')">
-                    <div class="pdf-icon">📄</div>
-                    <div class="pdf-name">${escapeHtml(pdf.name)}</div>
-                    ${pdf.description ? `<div class="pdf-description">${escapeHtml(pdf.description)}</div>` : ''}
-                    <div class="pdf-date">Added: ${formatDate(pdf.addedDate)}</div>
-                </div>
-            `).join('');
         }
 
         function loadManageList() {
@@ -708,11 +707,11 @@
             const list = document.getElementById('pdfList');
 
             if (pdfs.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-gray);">No PDFs added yet</p>';
+                list.innerHTML = '<p style="text-align: center; color: var(--text-gray); padding: 20px;">No PDFs added yet</p>';
                 return;
             }
 
-            list.innerHTML = pdfs.map(pdf => `
+            list.innerHTML = pdfs.map((pdf, index) => `
                 <div class="pdf-list-item">
                     <div class="pdf-list-info">
                         <div class="pdf-list-name">${escapeHtml(pdf.name)}</div>
@@ -730,7 +729,8 @@
             pdfs = pdfs.filter(pdf => pdf.id !== id);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
             
-            loadPublicPDFs();
+            currentPDFIndex = 0;
+            loadAndDisplayPDF();
             loadManageList();
         }
 
@@ -739,15 +739,6 @@
             element.textContent = message;
             element.style.display = 'block';
             setTimeout(() => element.style.display = 'none', 4000);
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric'
-            });
         }
 
         function escapeHtml(text) {
