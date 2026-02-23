@@ -1,840 +1,628 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Vault - Document Library</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --danger: #ef4444;
-            --success: #10b981;
-            --bg-dark: #0f172a;
-            --bg-light: #1e293b;
-            --text-light: #f1f5f9;
-            --text-gray: #94a3b8;
-            --border: #334155;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-        }
-
-        /* Floating Admin Button */
-        .admin-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            font-size: 0.9em;
-        }
-
-        .admin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
-        }
-
-        .admin-btn.logged-in {
-            background: var(--success);
-        }
-
-        /* View Toggle Button */
-        .view-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 10px 20px;
-            background: var(--bg-light);
-            color: var(--text-light);
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            font-size: 0.85em;
-        }
-
-        .view-toggle:hover {
-            border-color: var(--primary);
-            background: var(--primary);
-        }
-
-        /* PDF Grid Container */
-        .pdf-grid-container {
-            width: 100%;
-            height: 100vh;
-            display: grid;
-            gap: 10px;
-            padding: 10px;
-            background: var(--bg-dark);
-        }
-
-        /* Grid layouts based on PDF count */
-        .pdf-grid-container.grid-1 {
-            grid-template-columns: 1fr;
-        }
-
-        .pdf-grid-container.grid-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .pdf-grid-container.grid-3 {
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-        }
-
-        .pdf-grid-container.grid-4 {
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-        }
-
-        .pdf-grid-container.grid-5,
-        .pdf-grid-container.grid-6 {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-        }
-
-        .pdf-grid-container.grid-7,
-        .pdf-grid-container.grid-8,
-        .pdf-grid-container.grid-9 {
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-        }
-
-        /* Single View */
-        .pdf-grid-container.single-view {
-            grid-template-columns: 1fr;
-            padding: 0;
-            gap: 0;
-        }
-
-        .pdf-viewer-wrapper {
-            position: relative;
-            background: var(--bg-light);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-        }
-
-        .pdf-grid-container.single-view .pdf-viewer-wrapper {
-            border-radius: 0;
-            border: none;
-        }
-
-        .pdf-viewer-wrapper .pdf-title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            padding: 10px 15px;
-            font-size: 0.9em;
-            font-weight: 600;
-            z-index: 10;
-            border-bottom: 1px solid var(--border);
-            display: none;
-        }
-
-        .pdf-grid-container:not(.single-view) .pdf-viewer-wrapper .pdf-title {
-            display: block;
-        }
-
-        .pdf-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Empty State */
-        .no-pdf-message {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        }
-
-        .no-pdf-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .no-pdf-text {
-            font-size: 1.3em;
-            color: var(--text-gray);
-            text-align: center;
-            padding: 0 20px;
-        }
-
-        /* Modal Overlay */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Login Modal */
-        .login-modal {
-            background: var(--bg-light);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 450px;
-            width: 90%;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-            animation: slideUp 0.3s ease;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            font-size: 1.5em;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close-modal:hover {
-            color: var(--text-light);
-        }
-
-        .modal-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .modal-header h2 {
-            font-size: 1.8em;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .modal-header p {
-            color: var(--text-gray);
-            font-size: 0.9em;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-gray);
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-dark);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-light);
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            margin-top: 10px;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .error-message, .success-message {
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            display: none;
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-
-        .success-message {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-
-        .help-text {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid var(--primary);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            color: var(--text-gray);
-        }
-
-        .help-text strong {
-            color: var(--text-light);
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .help-text ol {
-            margin-left: 18px;
-            margin-top: 8px;
-        }
-
-        .help-text li {
-            margin-bottom: 3px;
-        }
-
-        /* Admin Tabs */
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: var(--bg-dark);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-gray);
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .pdf-list-item {
-            background: var(--bg-dark);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pdf-list-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .pdf-list-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-
-        .pdf-list-desc {
-            font-size: 0.85em;
-            color: var(--text-gray);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 0.85em;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-small:hover {
-            background: #dc2626;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .admin-btn {
-                top: 10px;
-                right: 10px;
-                padding: 10px 20px;
-                font-size: 0.85em;
-            }
-
-            .view-toggle {
-                top: 60px;
-                left: 10px;
-                font-size: 0.8em;
-                padding: 8px 16px;
-            }
-
-            .login-modal {
-                padding: 30px 20px;
-            }
-
-            .pdf-grid-container.grid-3,
-            .pdf-grid-container.grid-4,
-            .pdf-grid-container.grid-5,
-            .pdf-grid-container.grid-6 {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-            }
-
-            .pdf-grid-container.grid-7,
-            .pdf-grid-container.grid-8,
-            .pdf-grid-container.grid-9 {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>➕ Addition Practice</title>
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-dark: #574fd6;
+    --accent: #ff6584;
+    --green: #43d98f;
+    --green-dark: #2bb87a;
+    --bg: #f0f2ff;
+    --card: #ffffff;
+    --text: #2d2d44;
+    --muted: #8888aa;
+    --border: #e0e0f5;
+    --shadow: 0 4px 20px rgba(108,99,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
+    color: white;
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 12px rgba(108,99,255,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; flex: 1; }
+  .header-emoji { font-size: 1.5rem; }
+
+  /* ===== STOPWATCH ===== */
+  .stopwatch-bar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .sw-display {
+    font-size: 2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary);
+    letter-spacing: 2px;
+    background: var(--bg);
+    padding: 6px 20px;
+    border-radius: 12px;
+    min-width: 160px;
+    text-align: center;
+  }
+  .sw-display.running { color: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+
+  .sw-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sw-btn:active { transform: scale(0.95); }
+  .sw-start { background: var(--green); color: white; }
+  .sw-start:hover { background: var(--green-dark); }
+  .sw-stop { background: var(--accent); color: white; }
+  .sw-reset { background: var(--border); color: var(--muted); }
+  .sw-reset:hover { background: #d0d0e8; }
+
+  /* ===== TABS ===== */
+  .tabs-wrapper {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs-wrapper::-webkit-scrollbar { display: none; }
+  .tabs {
+    display: flex;
+    padding: 0 12px;
+    gap: 4px;
+    min-width: max-content;
+  }
+  .tab {
+    padding: 12px 18px;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--primary); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ===== MAIN CONTENT ===== */
+  .main { padding: 16px; max-width: 900px; margin: 0 auto; }
+
+  .sheet-panel { display: none; }
+  .sheet-panel.active { display: block; }
+
+  /* ===== ACTION ROW ===== */
+  .action-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-refresh { background: linear-gradient(135deg, #6c63ff, #a78bfa); color: white; }
+  .btn-refresh:hover { background: linear-gradient(135deg, #574fd6, #9068f5); }
+  .btn-answer { background: linear-gradient(135deg, #ff6584, #ff8fa3); color: white; }
+  .btn-answer:hover { background: linear-gradient(135deg, #e0496a, #ff7896); }
+  .btn-answer.showing { background: linear-gradient(135deg, #43d98f, #5af0a4); }
+
+  /* ===== GRID CARD ===== */
+  .grid-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .grid-title {
+    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
+    color: white;
+    padding: 14px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 6px;
+    width: 100%;
+  }
+
+  th {
+    background: var(--bg);
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 52px;
+  }
+
+  td {
+    text-align: center;
+    padding: 10px 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 10px;
+    min-width: 52px;
+    transition: background 0.2s;
+  }
+
+  td.num {
+    background: white;
+    border: 2px solid var(--border);
+    font-size: 1.05rem;
+    color: #333;
+  }
+
+  td.total-col {
+    background: linear-gradient(135deg, #6c63ff22, #a78bfa22);
+    color: var(--primary);
+    border: 2px solid #a78bfa55;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  td.total-row {
+    background: linear-gradient(135deg, #ff658422, #ff8fa322);
+    color: var(--accent);
+    border: 2px solid #ff658455;
+    font-weight: 800;
+  }
+
+  td.total-corner {
+    background: linear-gradient(135deg, #6c63ff33, #ff658433);
+    color: var(--text);
+    font-weight: 900;
+    border: 2px solid var(--primary);
+  }
+
+  /* Answer styles */
+  .answer-cell {
+    display: none;
+    color: var(--green);
+    font-weight: 800;
+  }
+  .answers-visible .answer-cell { display: inline; }
+  .answers-visible .num { border-color: var(--green); background: #f0fff8; }
+
+  /* Basic addition special */
+  .basic-label {
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .header-title { font-size: 1.05rem; }
+    .sw-display { font-size: 1.6rem; min-width: 130px; }
+    .main { padding: 10px; }
+    th, td { padding: 7px 6px; min-width: 40px; font-size: 0.85rem; }
+    .btn { padding: 9px 14px; font-size: 0.82rem; }
+    .grid-title { font-size: 0.9rem; padding: 12px 14px; }
+  }
+</style>
 </head>
 <body>
-    <!-- Floating Admin Button -->
-    <button class="admin-btn" id="adminBtn" onclick="openAdminModal()">
-        🔐 Admin
-    </button>
 
-    <!-- View Toggle Button -->
-    <button class="view-toggle" id="viewToggle" onclick="toggleView()" style="display: none;">
-        📄 Single View
-    </button>
+<div class="header">
+  <span class="header-emoji">➕</span>
+  <div class="header-title">Addition Practice Sheets</div>
+</div>
 
-    <!-- PDF Grid Container -->
-    <div class="pdf-grid-container single-view" id="pdfGridContainer">
-        <div class="no-pdf-message">
-            <div class="no-pdf-icon">📭</div>
-            <div class="no-pdf-text">No PDFs available yet.<br>Admin can add documents from the top-right corner.</div>
-        </div>
+<!-- STOPWATCH -->
+<div class="stopwatch-bar">
+  <div class="sw-display" id="swDisplay">00:00.0</div>
+  <button class="sw-btn sw-start" id="swBtn" onclick="swToggle()">▶ Start</button>
+  <button class="sw-btn sw-reset" onclick="swReset()">↺ Reset</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('basic')">Basic</button>
+    <button class="tab" onclick="showTab('5x5')">5×5</button>
+    <button class="tab" onclick="showTab('6x6')">6×6</button>
+    <button class="tab" onclick="showTab('7x7')">7×7</button>
+    <button class="tab" onclick="showTab('8x8')">8×8</button>
+    <button class="tab" onclick="showTab('9x9')">9×9</button>
+    <button class="tab" onclick="showTab('10x10')">10×10</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ====== BASIC ADDITION ====== -->
+  <div class="sheet-panel active" id="panel-basic">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('basic')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-basic" onclick="toggleAnswers('basic')">👁 Show Answers</button>
     </div>
-
-    <!-- Login/Admin Modal -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-        <div class="login-modal" onclick="event.stopPropagation()">
-            <button class="close-modal" onclick="closeModal()">×</button>
-            
-            <!-- Login Form -->
-            <div id="loginForm">
-                <div class="modal-header">
-                    <h2>🔐 Admin Login</h2>
-                    <p>Enter credentials to manage PDFs</p>
-                </div>
-                <div id="loginError" class="error-message"></div>
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="username" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="password" required autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-            </div>
-
-            <!-- Admin Panel -->
-            <div id="adminPanel" style="display: none;">
-                <div class="modal-header">
-                    <h2>⚙️ Admin Panel</h2>
-                    <p>Manage PDF documents</p>
-                </div>
-
-                <div class="admin-tabs">
-                    <button class="tab-btn active" onclick="switchTab('add')">➕ Add</button>
-                    <button class="tab-btn" onclick="switchTab('manage')">📋 Manage</button>
-                </div>
-
-                <!-- Add PDF Tab -->
-                <div id="addTab" class="tab-content active">
-                    <div id="addSuccess" class="success-message"></div>
-                    
-                    <div class="help-text">
-                        <strong>📋 How to add PDF:</strong>
-                        <ol>
-                            <li>Upload PDF to Google Drive</li>
-                            <li>Right-click → Share → "Anyone with link"</li>
-                            <li>Copy link and paste below</li>
-                        </ol>
-                    </div>
-
-                    <form onsubmit="handleAddPDF(event)">
-                        <div class="form-group">
-                            <label>PDF Name</label>
-                            <input type="text" id="pdfName" placeholder="e.g., Annual Report 2024" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Google Drive Link</label>
-                            <input type="url" id="pdfUrl" placeholder="https://drive.google.com/file/d/..." required>
-                        </div>
-                        <div class="form-group">
-                            <label>Description (Optional)</label>
-                            <textarea id="pdfDescription" placeholder="Brief description..."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add PDF</button>
-                    </form>
-                </div>
-
-                <!-- Manage PDFs Tab -->
-                <div id="manageTab" class="tab-content">
-                    <div id="pdfList"></div>
-                </div>
-
-                <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
-            </div>
-        </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 Basic Addition — 10 Rows × 10 Columns</div>
+      <div class="table-wrap">
+        <table id="table-basic"></table>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const ADMIN_USERNAME = 'ajay2003';
-        const ADMIN_PASSWORD = '03062003';
-        const STORAGE_KEY = 'pdfVaultLinks';
+  <!-- ====== 5×5 ====== -->
+  <div class="sheet-panel" id="panel-5x5">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('5x5')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-5x5" onclick="toggleAnswers('5x5')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 5×5 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-5x5"></table>
+      </div>
+    </div>
+  </div>
 
-        let isLoggedIn = false;
-        let isGridView = false;
+  <!-- ====== 6×6 ====== -->
+  <div class="sheet-panel" id="panel-6x6">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('6x6')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-6x6" onclick="toggleAnswers('6x6')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 6×6 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-6x6"></table>
+      </div>
+    </div>
+  </div>
 
-        // Load and display PDFs on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            loadAndDisplayPDFs();
-        });
+  <!-- ====== 7×7 ====== -->
+  <div class="sheet-panel" id="panel-7x7">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('7x7')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-7x7" onclick="toggleAnswers('7x7')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 7×7 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-7x7"></table>
+      </div>
+    </div>
+  </div>
 
-        function loadAndDisplayPDFs() {
-            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const container = document.getElementById('pdfGridContainer');
-            const toggleBtn = document.getElementById('viewToggle');
+  <!-- ====== 8×8 ====== -->
+  <div class="sheet-panel" id="panel-8x8">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('8x8')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-8x8" onclick="toggleAnswers('8x8')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 8×8 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-8x8"></table>
+      </div>
+    </div>
+  </div>
 
-            if (pdfs.length === 0) {
-                container.innerHTML = `
-                    <div class="no-pdf-message">
-                        <div class="no-pdf-icon">📭</div>
-                        <div class="no-pdf-text">No PDFs available yet.<br>Admin can add documents from the top-right corner.</div>
-                    </div>
-                `;
-                container.className = 'pdf-grid-container single-view';
-                toggleBtn.style.display = 'none';
-                return;
-            }
+  <!-- ====== 9×9 ====== -->
+  <div class="sheet-panel" id="panel-9x9">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('9x9')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-9x9" onclick="toggleAnswers('9x9')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 9×9 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-9x9"></table>
+      </div>
+    </div>
+  </div>
 
-            // Show toggle button if more than 1 PDF
-            if (pdfs.length > 1) {
-                toggleBtn.style.display = 'block';
-                updateToggleButton();
-            } else {
-                toggleBtn.style.display = 'none';
-                isGridView = false;
-            }
+  <!-- ====== 10×10 ====== -->
+  <div class="sheet-panel" id="panel-10x10">
+    <div class="action-row">
+      <button class="btn btn-refresh" onclick="refreshSheet('10x10')">🔀 Refresh Numbers</button>
+      <button class="btn btn-answer" id="ans-10x10" onclick="toggleAnswers('10x10')">👁 Show Answers</button>
+    </div>
+    <div class="grid-card">
+      <div class="grid-title">📝 10×10 Addition Grid</div>
+      <div class="table-wrap">
+        <table id="table-10x10"></table>
+      </div>
+    </div>
+  </div>
 
-            // Set grid class based on PDF count and view mode
-            if (isGridView && pdfs.length > 1) {
-                container.className = `pdf-grid-container grid-${Math.min(pdfs.length, 9)}`;
-            } else {
-                container.className = 'pdf-grid-container single-view';
-            }
+</div><!-- /main -->
 
-            // Display PDFs
-            if (isGridView && pdfs.length > 1) {
-                // Grid view - show all PDFs
-                container.innerHTML = pdfs.map(pdf => `
-                    <div class="pdf-viewer-wrapper">
-                        <div class="pdf-title">${escapeHtml(pdf.name)}</div>
-                        <iframe class="pdf-iframe" src="${pdf.embedUrl}" allowfullscreen></iframe>
-                    </div>
-                `).join('');
-            } else {
-                // Single view - show first PDF
-                container.innerHTML = `
-                    <div class="pdf-viewer-wrapper">
-                        <iframe class="pdf-iframe" src="${pdfs[0].embedUrl}" allowfullscreen></iframe>
-                    </div>
-                `;
-            }
-        }
+<script>
+// ========================
+// UTILITY
+// ========================
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-        function toggleView() {
-            isGridView = !isGridView;
-            updateToggleButton();
-            loadAndDisplayPDFs();
-        }
+// ========================
+// DATA STORE
+// ========================
+const data = {};
 
-        function updateToggleButton() {
-            const btn = document.getElementById('viewToggle');
-            if (isGridView) {
-                btn.textContent = '📄 Single View';
-            } else {
-                btn.textContent = '🔲 Grid View';
-            }
-        }
+function genGrid(rows, cols) {
+  const grid = [];
+  for (let r = 0; r < rows; r++) {
+    grid[r] = [];
+    for (let c = 0; c < cols; c++) {
+      grid[r][c] = randInt(10, 99);
+    }
+  }
+  return grid;
+}
 
-        function openAdminModal() {
-            document.getElementById('modalOverlay').classList.add('active');
-            if (isLoggedIn) {
-                showAdminPanel();
-            }
-        }
+// ========================
+// RENDER FUNCTIONS
+// ========================
 
-        function closeModal(event) {
-            if (event && event.target !== event.currentTarget) return;
-            document.getElementById('modalOverlay').classList.remove('active');
-        }
+// Basic addition: 10 rows (addends) × 10 columns (addends)
+// Table shows: top row = col numbers, left col = row numbers, cells = sum (answer)
+function renderBasic() {
+  const rows = data['basic'].rows; // 10 values
+  const cols = data['basic'].cols; // 10 values
+  const tbl = document.getElementById('table-basic');
+  const showAns = tbl.closest('.sheet-panel').classList.contains('answers-visible') ||
+    document.getElementById('panel-basic').classList.contains('answers-visible');
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+  let html = '<thead><tr><th class="basic-label">+</th>';
+  for (let c = 0; c < 10; c++) html += `<th>${cols[c]}</th>`;
+  html += '</tr></thead><tbody>';
 
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                isLoggedIn = true;
-                showAdminPanel();
-                updateAdminButton();
-            } else {
-                showMessage('loginError', 'Invalid credentials');
-            }
-        }
+  for (let r = 0; r < 10; r++) {
+    html += `<tr><th>${rows[r]}</th>`;
+    for (let c = 0; c < 10; c++) {
+      const sum = rows[r] + cols[c];
+      html += `<td class="num">${rows[r]}+${cols[c]}<br><span class="answer-cell">${sum}</span></td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
 
-        function showAdminPanel() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadManageList();
-        }
+// NxN grid: rows and cols are separate arrays; cells show row val + col val with totals
+function renderNxN(key, n) {
+  const rows = data[key].rows;
+  const cols = data[key].cols;
+  const tbl = document.getElementById('table-' + key);
 
-        function handleLogout() {
-            isLoggedIn = false;
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            updateAdminButton();
-            closeModal();
-        }
+  // col totals
+  const colTotals = cols.map(v => rows.reduce((s, r) => s + r + v, 0));
+  // row totals
+  const rowTotals = rows.map(r => cols.reduce((s, c) => s + r + c, 0));
+  const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
 
-        function updateAdminButton() {
-            const btn = document.getElementById('adminBtn');
-            if (isLoggedIn) {
-                btn.textContent = '⚙️ Panel';
-                btn.classList.add('logged-in');
-            } else {
-                btn.textContent = '🔐 Admin';
-                btn.classList.remove('logged-in');
-            }
-        }
+  let html = '<thead><tr><th class="basic-label">+</th>';
+  for (let c = 0; c < n; c++) html += `<th>${cols[c]}</th>`;
+  html += '<th class="basic-label">Total</th></tr></thead><tbody>';
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            if (tab === 'add') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('addTab').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('manageTab').classList.add('active');
-                loadManageList();
-            }
-        }
+  for (let r = 0; r < n; r++) {
+    html += `<tr><th>${rows[r]}</th>`;
+    for (let c = 0; c < n; c++) {
+      const sum = rows[r] + cols[c];
+      html += `<td class="num">${rows[r]}+${cols[c]}<br><span class="answer-cell">${sum}</span></td>`;
+    }
+    html += `<td class="total-col"><span class="answer-cell">${rowTotals[r]}</span><span style="display:inline" class="question-mark"></span></td>`;
+    html += '</tr>';
+  }
 
-        function handleAddPDF(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('pdfName').value.trim();
-            const url = document.getElementById('pdfUrl').value.trim();
-            const description = document.getElementById('pdfDescription').value.trim();
+  // Total row
+  html += '<tr><th>Total</th>';
+  for (let c = 0; c < n; c++) {
+    html += `<td class="total-row"><span class="answer-cell">${colTotals[c]}</span></td>`;
+  }
+  html += `<td class="total-corner"><span class="answer-cell">${grandTotal}</span></td></tr>`;
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
 
-            const fileId = extractFileId(url);
-            if (!fileId) {
-                showMessage('addSuccess', 'Invalid Google Drive link', true);
-                return;
-            }
+// ========================
+// INIT DATA & RENDER
+// ========================
+function initSheet(key, n) {
+  if (key === 'basic') {
+    data['basic'] = {
+      rows: Array.from({length: 10}, () => randInt(10, 99)),
+      cols: Array.from({length: 10}, () => randInt(10, 99))
+    };
+    renderBasic();
+  } else {
+    data[key] = {
+      rows: Array.from({length: n}, () => randInt(10, 99)),
+      cols: Array.from({length: n}, () => randInt(10, 99))
+    };
+    renderNxN(key, n);
+  }
+}
 
-            const pdfData = {
-                id: Date.now(),
-                name: name,
-                url: url,
-                embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
-                description: description,
-                addedDate: new Date().toISOString()
-            };
+function initAll() {
+  initSheet('basic', 10);
+  initSheet('5x5', 5);
+  initSheet('6x6', 6);
+  initSheet('7x7', 7);
+  initSheet('8x8', 8);
+  initSheet('9x9', 9);
+  initSheet('10x10', 10);
+}
 
-            savePDF(pdfData);
-            
-            document.getElementById('pdfName').value = '';
-            document.getElementById('pdfUrl').value = '';
-            document.getElementById('pdfDescription').value = '';
-            
-            showMessage('addSuccess', `"${name}" added successfully!`);
-            loadAndDisplayPDFs();
-        }
+// ========================
+// REFRESH
+// ========================
+function refreshSheet(key) {
+  const sizes = { basic: 10, '5x5': 5, '6x6': 6, '7x7': 7, '8x8': 8, '9x9': 9, '10x10': 10 };
+  const n = sizes[key];
 
-        function extractFileId(url) {
-            const patterns = [
-                /\/file\/d\/([a-zA-Z0-9_-]+)/,
-                /id=([a-zA-Z0-9_-]+)/,
-                /^([a-zA-Z0-9_-]+)$/
-            ];
+  // Animate refresh
+  const tbl = document.getElementById('table-' + key);
+  tbl.style.opacity = '0.3';
+  tbl.style.transform = 'scale(0.97)';
 
-            for (let pattern of patterns) {
-                const match = url.match(pattern);
-                if (match) return match[1];
-            }
-            return null;
-        }
+  setTimeout(() => {
+    initSheet(key, n);
+    // Reapply answer visibility
+    const panel = document.getElementById('panel-' + key);
+    if (panel.classList.contains('answers-visible')) {
+      // answers stay visible after refresh
+    }
+    tbl.style.opacity = '1';
+    tbl.style.transform = 'scale(1)';
+    tbl.style.transition = 'opacity 0.3s, transform 0.3s';
+    setTimeout(() => { tbl.style.transition = ''; }, 350);
+  }, 150);
+}
 
-        function savePDF(pdfData) {
-            let pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            pdfs.push(pdfData);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
-        }
+// ========================
+// ANSWERS TOGGLE
+// ========================
+const answerState = {};
 
-        function loadManageList() {
-            const pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const list = document.getElementById('pdfList');
+function toggleAnswers(key) {
+  const panel = document.getElementById('panel-' + key);
+  const btn = document.getElementById('ans-' + key);
 
-            if (pdfs.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-gray); padding: 20px;">No PDFs added yet</p>';
-                return;
-            }
+  answerState[key] = !answerState[key];
 
-            list.innerHTML = pdfs.map((pdf, index) => `
-                <div class="pdf-list-item">
-                    <div class="pdf-list-info">
-                        <div class="pdf-list-name">${escapeHtml(pdf.name)}</div>
-                        <div class="pdf-list-desc">${pdf.description || 'No description'}</div>
-                    </div>
-                    <button class="btn-small" onclick="deletePDF(${pdf.id})">Delete</button>
-                </div>
-            `).join('');
-        }
+  if (answerState[key]) {
+    panel.classList.add('answers-visible');
+    btn.textContent = '🙈 Hide Answers';
+    btn.classList.add('showing');
+  } else {
+    panel.classList.remove('answers-visible');
+    btn.textContent = '👁 Show Answers';
+    btn.classList.remove('showing');
+  }
+}
 
-        function deletePDF(id) {
-            if (!confirm('Delete this PDF?')) return;
+// ========================
+// TAB SWITCHING
+// ========================
+function showTab(key) {
+  document.querySelectorAll('.sheet-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
 
-            let pdfs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            pdfs = pdfs.filter(pdf => pdf.id !== id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(pdfs));
-            
-            loadAndDisplayPDFs();
-            loadManageList();
-        }
+  document.getElementById('panel-' + key).classList.add('active');
+  const tabs = document.querySelectorAll('.tab');
+  const tabMap = ['basic', '5x5', '6x6', '7x7', '8x8', '9x9', '10x10'];
+  tabs[tabMap.indexOf(key)].classList.add('active');
+}
 
-        function showMessage(elementId, message, isError = false) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.style.display = 'block';
-            setTimeout(() => element.style.display = 'none', 4000);
-        }
+// ========================
+// STOPWATCH
+// ========================
+let swInterval = null;
+let swMs = 0;
+let swRunning = false;
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-    </script>
+function swFormat(ms) {
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.floor((ms % 60000) / 1000);
+  const tenths = Math.floor((ms % 1000) / 100);
+  return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${tenths}`;
+}
+
+function swTick() {
+  swMs += 100;
+  document.getElementById('swDisplay').textContent = swFormat(swMs);
+}
+
+function swToggle() {
+  const btn = document.getElementById('swBtn');
+  const display = document.getElementById('swDisplay');
+
+  if (!swRunning) {
+    swRunning = true;
+    swInterval = setInterval(swTick, 100);
+    btn.textContent = '⏸ Pause';
+    btn.className = 'sw-btn sw-stop';
+    display.classList.add('running');
+  } else {
+    swRunning = false;
+    clearInterval(swInterval);
+    btn.textContent = '▶ Resume';
+    btn.className = 'sw-btn sw-start';
+    display.classList.remove('running');
+  }
+}
+
+function swReset() {
+  swRunning = false;
+  clearInterval(swInterval);
+  swMs = 0;
+  document.getElementById('swDisplay').textContent = '00:00.0';
+  document.getElementById('swDisplay').classList.remove('running');
+  document.getElementById('swBtn').textContent = '▶ Start';
+  document.getElementById('swBtn').className = 'sw-btn sw-start';
+}
+
+// ========================
+// BOOT
+// ========================
+window.addEventListener('DOMContentLoaded', initAll);
+</script>
 </body>
 </html>
