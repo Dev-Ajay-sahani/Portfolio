@@ -238,8 +238,17 @@
     color: var(--green);
     font-weight: 800;
   }
+  .blank-cell {
+    display: inline;
+    color: #ccc;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
   .answers-visible .answer-cell { display: inline; }
+  .answers-visible .blank-cell { display: none; }
   .answers-visible .num { border-color: var(--green); background: #f0fff8; }
+  .answers-visible .total-col { border-color: var(--primary); }
+  .answers-visible .total-row { border-color: var(--accent); }
 
   /* Basic addition special */
   .basic-label {
@@ -437,7 +446,7 @@ function renderBasic() {
     html += `<tr><th>${rows[r]}</th>`;
     for (let c = 0; c < 10; c++) {
       const sum = rows[r] + cols[c];
-      html += `<td class="num">${rows[r]}+${cols[c]}<br><span class="answer-cell">${sum}</span></td>`;
+      html += `<td class="num">${rows[r]}+${cols[c]}=<span class="answer-cell">${sum}</span><span class="blank-cell">?</span></td>`;
     }
     html += '</tr>';
   }
@@ -445,38 +454,37 @@ function renderBasic() {
   tbl.innerHTML = html;
 }
 
-// NxN grid: rows and cols are separate arrays; cells show row val + col val with totals
+// NxN grid: random numbers in every cell, totals shown as ? until answers revealed
 function renderNxN(key, n) {
-  const rows = data[key].rows;
-  const cols = data[key].cols;
+  const grid = data[key].grid; // n×n array of random numbers
   const tbl = document.getElementById('table-' + key);
 
-  // col totals
-  const colTotals = cols.map(v => rows.reduce((s, r) => s + r + v, 0));
-  // row totals
-  const rowTotals = rows.map(r => cols.reduce((s, c) => s + r + c, 0));
+  // row totals and col totals
+  const rowTotals = grid.map(row => row.reduce((s, v) => s + v, 0));
+  const colTotals = Array.from({length: n}, (_, c) => grid.reduce((s, row) => s + row[c], 0));
   const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
 
-  let html = '<thead><tr><th class="basic-label">+</th>';
-  for (let c = 0; c < n; c++) html += `<th>${cols[c]}</th>`;
+  let html = '<thead><tr>';
+  html += `<th class="basic-label"></th>`;
+  for (let c = 0; c < n; c++) html += `<th class="basic-label">#${c+1}</th>`;
   html += '<th class="basic-label">Total</th></tr></thead><tbody>';
 
   for (let r = 0; r < n; r++) {
-    html += `<tr><th>${rows[r]}</th>`;
+    html += '<tr>';
+    html += `<th>${r+1}</th>`;
     for (let c = 0; c < n; c++) {
-      const sum = rows[r] + cols[c];
-      html += `<td class="num">${rows[r]}+${cols[c]}<br><span class="answer-cell">${sum}</span></td>`;
+      html += `<td class="num">${grid[r][c]}</td>`;
     }
-    html += `<td class="total-col"><span class="answer-cell">${rowTotals[r]}</span><span style="display:inline" class="question-mark"></span></td>`;
+    html += `<td class="total-col"><span class="answer-cell">${rowTotals[r]}</span><span class="blank-cell">?</span></td>`;
     html += '</tr>';
   }
 
-  // Total row
+  // Total row (col totals)
   html += '<tr><th>Total</th>';
   for (let c = 0; c < n; c++) {
-    html += `<td class="total-row"><span class="answer-cell">${colTotals[c]}</span></td>`;
+    html += `<td class="total-row"><span class="answer-cell">${colTotals[c]}</span><span class="blank-cell">?</span></td>`;
   }
-  html += `<td class="total-corner"><span class="answer-cell">${grandTotal}</span></td></tr>`;
+  html += `<td class="total-corner"><span class="answer-cell">${grandTotal}</span><span class="blank-cell">?</span></td></tr>`;
   html += '</tbody>';
   tbl.innerHTML = html;
 }
@@ -493,8 +501,7 @@ function initSheet(key, n) {
     renderBasic();
   } else {
     data[key] = {
-      rows: Array.from({length: n}, () => randInt(10, 99)),
-      cols: Array.from({length: n}, () => randInt(10, 99))
+      grid: genGrid(n, n)
     };
     renderNxN(key, n);
   }
