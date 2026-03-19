@@ -2,634 +2,1008 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>➕ Addition Practice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Practice Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --primary: #6c63ff;
-    --primary-dark: #574fd6;
-    --accent: #ff6584;
-    --green: #43d98f;
-    --green-dark: #2bb87a;
-    --bg: #f0f2ff;
-    --card: #ffffff;
-    --text: #2d2d44;
-    --muted: #8888aa;
-    --border: #e0e0f5;
-    --shadow: 0 4px 20px rgba(108,99,255,0.12);
-  }
+:root {
+  --bg: #0f0f14;
+  --panel: #16161f;
+  --card: #1e1e2a;
+  --border: #2a2a3d;
+  --border2: #333350;
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  --add: #00d4aa;
+  --add-dim: #00d4aa22;
+  --add-mid: #00d4aa55;
 
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+  --sub: #ff6b6b;
+  --sub-dim: #ff6b6b22;
+  --sub-mid: #ff6b6b55;
 
-  /* ===== HEADER ===== */
-  .header {
-    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
-    color: white;
-    padding: 16px 20px 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 2px 12px rgba(108,99,255,0.3);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-title { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; flex: 1; }
-  .header-emoji { font-size: 1.5rem; }
+  --mul: #f9c74f;
+  --mul-dim: #f9c74f22;
+  --mul-mid: #f9c74f55;
 
-  /* ===== STOPWATCH ===== */
-  .stopwatch-bar {
-    background: white;
-    border-bottom: 1px solid var(--border);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .sw-display {
-    font-size: 2rem;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-    color: var(--primary);
-    letter-spacing: 2px;
-    background: var(--bg);
-    padding: 6px 20px;
-    border-radius: 12px;
-    min-width: 160px;
-    text-align: center;
-  }
-  .sw-display.running { color: var(--accent); animation: pulse 1s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+  --div: #a78bfa;
+  --div-dim: #a78bfa22;
+  --div-mid: #a78bfa55;
 
-  .sw-btn {
-    border: none;
-    border-radius: 10px;
-    padding: 8px 18px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .sw-btn:active { transform: scale(0.95); }
-  .sw-start { background: var(--green); color: white; }
-  .sw-start:hover { background: var(--green-dark); }
-  .sw-stop { background: var(--accent); color: white; }
-  .sw-reset { background: var(--border); color: var(--muted); }
-  .sw-reset:hover { background: #d0d0e8; }
+  --text: #e8e8f0;
+  --muted: #6666aa;
+  --muted2: #9999bb;
 
-  /* ===== TABS ===== */
-  .tabs-wrapper {
-    background: white;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tabs-wrapper::-webkit-scrollbar { display: none; }
-  .tabs {
-    display: flex;
-    padding: 0 12px;
-    gap: 4px;
-    min-width: max-content;
-  }
-  .tab {
-    padding: 12px 18px;
-    border: none;
-    background: transparent;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .tab:hover { color: var(--primary); }
-  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  --green: #4ade80;
+  --red: #f87171;
 
-  /* ===== MAIN CONTENT ===== */
-  .main { padding: 16px; max-width: 900px; margin: 0 auto; }
+  --font-mono: 'Space Mono', monospace;
+  --font-ui: 'DM Sans', sans-serif;
+}
 
-  .sheet-panel { display: none; }
-  .sheet-panel.active { display: block; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ===== ACTION ROW ===== */
-  .action-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .btn {
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.15s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn-refresh { background: linear-gradient(135deg, #6c63ff, #a78bfa); color: white; }
-  .btn-refresh:hover { background: linear-gradient(135deg, #574fd6, #9068f5); }
-  .btn-answer { background: linear-gradient(135deg, #ff6584, #ff8fa3); color: white; }
-  .btn-answer:hover { background: linear-gradient(135deg, #e0496a, #ff7896); }
-  .btn-answer.showing { background: linear-gradient(135deg, #43d98f, #5af0a4); }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+}
 
-  /* ===== GRID CARD ===== */
-  .grid-card {
-    background: var(--card);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
+/* ══════════════════════════════════════
+   APP SHELL — fixed full-height layout
+══════════════════════════════════════ */
+.app {
+  display: grid;
+  grid-template-rows: 48px 44px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  .grid-title {
-    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
-    color: white;
-    padding: 14px 20px;
-    font-size: 1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* ══════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+}
 
-  .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 16px;
-  }
+.logo {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.logo span { color: var(--add); }
 
-  table {
-    border-collapse: separate;
-    border-spacing: 6px;
-    width: 100%;
-  }
+.sw-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
 
-  th {
-    background: var(--bg);
-    color: var(--primary);
-    font-weight: 800;
-    font-size: 0.95rem;
-    padding: 10px 14px;
-    border-radius: 10px;
-    text-align: center;
-    min-width: 52px;
-  }
+.sw-time {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 90px;
+  letter-spacing: 1px;
+}
+.sw-time.run { color: var(--add); }
 
-  td {
-    text-align: center;
-    padding: 10px 10px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text);
-    background: var(--bg);
-    border-radius: 10px;
-    min-width: 52px;
-    transition: background 0.2s;
-  }
+.sw-btn {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 5px 12px;
+  background: transparent;
+  color: var(--muted2);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.sw-btn:hover { color: var(--text); border-color: var(--muted2); }
+.sw-btn.active { color: var(--add); border-color: var(--add); }
 
-  td.num {
-    background: white;
-    border: 2px solid var(--border);
-    font-size: 1.05rem;
-    color: #333;
-  }
+/* ══════════════════════════════════════
+   OPERATION TABS
+══════════════════════════════════════ */
+.op-tabs {
+  display: flex;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 8px;
+  gap: 2px;
+  align-items: stretch;
+}
 
-  td.total-col {
-    background: linear-gradient(135deg, #6c63ff22, #a78bfa22);
-    color: var(--primary);
-    border: 2px solid #a78bfa55;
-    font-size: 1rem;
-    font-weight: 800;
-  }
+.op-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0 12px;
+}
+.op-tab:hover { color: var(--text); }
+.op-tab.add.active { color: var(--add); border-bottom-color: var(--add); }
+.op-tab.sub.active { color: var(--sub); border-bottom-color: var(--sub); }
+.op-tab.mul.active { color: var(--mul); border-bottom-color: var(--mul); }
+.op-tab.div.active { color: var(--div); border-bottom-color: var(--div); }
+.op-icon { font-size: 1rem; }
 
-  td.total-row {
-    background: linear-gradient(135deg, #ff658422, #ff8fa322);
-    color: var(--accent);
-    border: 2px solid #ff658455;
-    font-weight: 800;
-  }
+/* ══════════════════════════════════════
+   OPERATION PANELS
+══════════════════════════════════════ */
+.op-panel {
+  display: none;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+.op-panel.active { display: grid; }
 
-  td.total-corner {
-    background: linear-gradient(135deg, #6c63ff33, #ff658433);
-    color: var(--text);
-    font-weight: 900;
-    border: 2px solid var(--primary);
-  }
+/* ══════════════════════════════════════
+   SIDEBAR — combination picker
+══════════════════════════════════════ */
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  /* Answer styles */
-  .answer-cell {
-    display: none;
-    color: var(--green);
-    font-weight: 800;
-  }
-  .blank-cell {
-    display: inline;
-    color: #ccc;
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-  .answers-visible .answer-cell { display: inline; }
-  .answers-visible .blank-cell { display: none; }
-  .answers-visible .num { border-color: var(--green); background: #f0fff8; }
-  .answers-visible .total-col { border-color: var(--primary); }
-  .answers-visible .total-row { border-color: var(--accent); }
+.sidebar-head {
+  padding: 14px 16px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
 
-  /* Basic addition special */
-  .basic-label {
-    background: var(--bg);
-    color: var(--muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 6px 10px;
-    text-align: center;
-  }
+.combo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.combo-list::-webkit-scrollbar { width: 4px; }
+.combo-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 480px) {
-    .header-title { font-size: 1.05rem; }
-    .sw-display { font-size: 1.6rem; min-width: 130px; }
-    .main { padding: 10px; }
-    th, td { padding: 7px 6px; min-width: 40px; font-size: 0.85rem; }
-    .btn { padding: 9px 14px; font-size: 0.82rem; }
-    .grid-title { font-size: 0.9rem; padding: 12px 14px; }
-  }
+.combo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.combo-item:hover { background: var(--card); border-color: var(--border); }
+.combo-item.active.add-c { background: var(--add-dim); border-color: var(--add-mid); }
+.combo-item.active.sub-c { background: var(--sub-dim); border-color: var(--sub-mid); }
+.combo-item.active.mul-c { background: var(--mul-dim); border-color: var(--mul-mid); }
+.combo-item.active.div-c { background: var(--div-dim); border-color: var(--div-mid); }
+
+.combo-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  min-width: 52px;
+  text-align: center;
+}
+.add-c .combo-badge { color: var(--add); background: var(--add-dim); }
+.sub-c .combo-badge { color: var(--sub); background: var(--sub-dim); }
+.mul-c .combo-badge { color: var(--mul); background: var(--mul-dim); }
+.div-c .combo-badge { color: var(--div); background: var(--div-dim); }
+
+.combo-label { font-size: 0.78rem; color: var(--muted2); font-weight: 500; }
+.combo-item.active .combo-label { color: var(--text); font-weight: 600; }
+
+/* ══════════════════════════════════════
+   CONTENT AREA
+══════════════════════════════════════ */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.content-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+.toolbar-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.toolbar-sub {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.tool-btn {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  padding: 6px 14px;
+  background: var(--card);
+  color: var(--muted2);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.tool-btn:hover { color: var(--text); border-color: var(--muted2); }
+.tool-btn:active { transform: scale(0.96); }
+.tool-btn.refresh { color: var(--add); border-color: var(--add-mid); }
+.tool-btn.refresh:hover { background: var(--add-dim); }
+.tool-btn.ans-show { color: var(--mul); border-color: var(--mul-mid); }
+.tool-btn.ans-show:hover { background: var(--mul-dim); }
+.tool-btn.ans-hide { color: var(--green); border-color: #4ade8055; }
+.tool-btn.ans-hide:hover { background: #4ade8022; }
+
+/* Score display */
+.score-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   QUESTION GRID AREA
+══════════════════════════════════════ */
+.grid-area {
+  flex: 1;
+  overflow: hidden;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ADDITION specific — uses existing NxN grid style */
+.add-grid-wrap, .nxn-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ——————————————————
+   QUESTION CARDS LAYOUT
+   Flex-wrap grid that fills width, no overflow-y
+—————————————————— */
+.q-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: flex-start;
+  overflow: hidden;
+  flex: 1;
+}
+
+.q-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 140px;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+.q-card:hover { border-color: var(--border2); }
+.q-card.revealed { border-color: var(--green); background: #4ade8008; }
+
+.q-num {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text);
+  letter-spacing: 0.5px;
+}
+.q-op-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 3px;
+  margin-top: 2px;
+}
+.q-op-sym {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.q-op-sym.sub-sym { color: var(--sub); }
+.q-op-sym.mul-sym { color: var(--mul); }
+.q-op-sym.div-sym { color: var(--div); }
+
+.q-second { font-family: var(--font-mono); font-size: 1.1rem; color: var(--text); }
+
+.q-ans-line {
+  width: 100%;
+  border-top: 2px solid var(--border);
+  padding-top: 4px;
+  margin-top: 2px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.q-blank { color: var(--border2); letter-spacing: 3px; }
+.q-answer { color: var(--green); display: none; }
+.revealed .q-blank { display: none; }
+.revealed .q-answer { display: block; }
+.revealed .q-ans-line { border-top-color: var(--green); }
+
+/* ══════════════════════════════════════
+   ADDITION PANEL — NxN grid tables
+══════════════════════════════════════ */
+.add-outer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-table-scroll {
+  flex: 1;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.add-table-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+.add-table-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.add-tab-bar {
+  display: flex;
+  gap: 4px;
+  padding: 0 0 10px 0;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.add-tab {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+.add-tab:hover { color: var(--text); border-color: var(--muted); }
+.add-tab.active { color: var(--add); border-color: var(--add); background: var(--add-dim); }
+
+.add-table-wrap table {
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+.add-table-wrap th {
+  background: var(--card);
+  color: var(--add);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: center;
+  min-width: 42px;
+  font-weight: 700;
+}
+.add-table-wrap td {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text);
+  min-width: 80px;
+}
+.add-table-wrap td.total-col {
+  background: var(--add-dim);
+  border-color: var(--add-mid);
+  color: var(--add);
+  font-weight: 700;
+}
+.add-table-wrap td.total-row {
+  background: #ff6b6b11;
+  border-color: var(--sub-mid);
+  color: var(--sub);
+  font-weight: 700;
+}
+.add-table-wrap td.total-corner {
+  background: var(--mul-dim);
+  border-color: var(--mul-mid);
+  color: var(--mul);
+  font-weight: 700;
+}
+.ans-span { display: none; color: var(--green); }
+.blank-span { color: var(--border2); letter-spacing: 2px; }
+.add-answers .ans-span { display: inline; }
+.add-answers .blank-span { display: none; }
+.add-answers td { border-color: var(--add-mid); }
+.add-answers td.total-col { border-color: var(--add); }
+
+/* ══════════════════════════════════════
+   SIZING: how many cards to show
+   Controlled per combination by JS
+══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   NO CONTENT PLACEHOLDER
+══════════════════════════════════════ */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 3rem; opacity: 0.3; }
+.empty-text { font-size: 0.85rem; font-weight: 500; }
+
+/* ══════════════════════════════════════
+   SCROLLBAR GENERAL
+══════════════════════════════════════ */
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
 </style>
 </head>
 <body>
+<div class="app">
 
-<div class="header">
-  <span class="header-emoji">➕</span>
-  <div class="header-title">Addition Practice Sheets</div>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="logo">Math<span>∞</span>Suite</div>
+    <div class="sw-group">
+      <div class="sw-time" id="swDisplay">00:00.0</div>
+      <button class="sw-btn" id="swStartBtn" onclick="swToggle()">▶ Start</button>
+      <button class="sw-btn" onclick="swReset()">↺ Reset</button>
+    </div>
+  </header>
+
+  <!-- OPERATION TABS -->
+  <nav class="op-tabs">
+    <button class="op-tab add active" onclick="switchOp('add')"><span class="op-icon">➕</span>Addition</button>
+    <button class="op-tab sub" onclick="switchOp('sub')"><span class="op-icon">➖</span>Subtraction</button>
+    <button class="op-tab mul" onclick="switchOp('mul')"><span class="op-icon">✖️</span>Multiplication</button>
+    <button class="op-tab div" onclick="switchOp('div')"><span class="op-icon">➗</span>Division</button>
+  </nav>
+
+  <!-- ═══════════════ ADDITION PANEL ═══════════════ -->
+  <section class="op-panel active" id="op-add">
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title">Addition Grids</div>
+          <div class="toolbar-sub">Row + Column = ?</div>
+        </div>
+        <button class="tool-btn refresh" onclick="addRefresh()">↻ Refresh</button>
+        <button class="tool-btn ans-show" id="add-ans-btn" onclick="addToggleAns()">👁 Show Answers</button>
+      </div>
+      <div class="grid-area">
+        <div class="add-outer">
+          <div class="add-tab-bar" id="add-tab-bar"></div>
+          <div class="add-table-scroll">
+            <div class="add-table-wrap" id="add-table-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ SUBTRACTION PANEL ═══════════════ -->
+  <section class="op-panel" id="op-sub">
+    <aside class="sidebar">
+      <div class="sidebar-head">Digit Combinations</div>
+      <div class="combo-list" id="sub-combo-list"></div>
+    </aside>
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title" id="sub-toolbar-title">Subtraction</div>
+          <div class="toolbar-sub" id="sub-toolbar-sub">Select a combination</div>
+        </div>
+        <button class="tool-btn refresh" onclick="opRefresh('sub')">↻ Refresh</button>
+        <button class="tool-btn ans-show" id="sub-ans-btn" onclick="opToggleAns('sub')">👁 Show Answers</button>
+      </div>
+      <div class="grid-area" id="sub-grid"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ MULTIPLICATION PANEL ═══════════════ -->
+  <section class="op-panel" id="op-mul">
+    <aside class="sidebar">
+      <div class="sidebar-head">Digit Combinations</div>
+      <div class="combo-list" id="mul-combo-list"></div>
+    </aside>
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title" id="mul-toolbar-title">Multiplication</div>
+          <div class="toolbar-sub" id="mul-toolbar-sub">Select a combination</div>
+        </div>
+        <button class="tool-btn refresh" onclick="opRefresh('mul')">↻ Refresh</button>
+        <button class="tool-btn ans-show" id="mul-ans-btn" onclick="opToggleAns('mul')">👁 Show Answers</button>
+      </div>
+      <div class="grid-area" id="mul-grid"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ DIVISION PANEL ═══════════════ -->
+  <section class="op-panel" id="op-div">
+    <aside class="sidebar">
+      <div class="sidebar-head">Digit Combinations</div>
+      <div class="combo-list" id="div-combo-list"></div>
+    </aside>
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title" id="div-toolbar-title">Division</div>
+          <div class="toolbar-sub" id="div-toolbar-sub">Select a combination</div>
+        </div>
+        <button class="tool-btn refresh" onclick="opRefresh('div')">↻ Refresh</button>
+        <button class="tool-btn ans-show" id="div-ans-btn" onclick="opToggleAns('div')">👁 Show Answers</button>
+      </div>
+      <div class="grid-area" id="div-grid"></div>
+    </div>
+  </section>
+
 </div>
-
-<!-- STOPWATCH -->
-<div class="stopwatch-bar">
-  <div class="sw-display" id="swDisplay">00:00.0</div>
-  <button class="sw-btn sw-start" id="swBtn" onclick="swToggle()">▶ Start</button>
-  <button class="sw-btn sw-reset" onclick="swReset()">↺ Reset</button>
-</div>
-
-<!-- TABS -->
-<div class="tabs-wrapper">
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('basic')">Basic</button>
-    <button class="tab" onclick="showTab('5x5')">5×5</button>
-    <button class="tab" onclick="showTab('6x6')">6×6</button>
-    <button class="tab" onclick="showTab('7x7')">7×7</button>
-    <button class="tab" onclick="showTab('8x8')">8×8</button>
-    <button class="tab" onclick="showTab('9x9')">9×9</button>
-    <button class="tab" onclick="showTab('10x10')">10×10</button>
-  </div>
-</div>
-
-<div class="main">
-
-  <!-- ====== BASIC ADDITION ====== -->
-  <div class="sheet-panel active" id="panel-basic">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('basic')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-basic" onclick="toggleAnswers('basic')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 Basic Addition — 10 Rows × 10 Columns</div>
-      <div class="table-wrap">
-        <table id="table-basic"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 5×5 ====== -->
-  <div class="sheet-panel" id="panel-5x5">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('5x5')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-5x5" onclick="toggleAnswers('5x5')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 5×5 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-5x5"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 6×6 ====== -->
-  <div class="sheet-panel" id="panel-6x6">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('6x6')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-6x6" onclick="toggleAnswers('6x6')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 6×6 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-6x6"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 7×7 ====== -->
-  <div class="sheet-panel" id="panel-7x7">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('7x7')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-7x7" onclick="toggleAnswers('7x7')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 7×7 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-7x7"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 8×8 ====== -->
-  <div class="sheet-panel" id="panel-8x8">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('8x8')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-8x8" onclick="toggleAnswers('8x8')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 8×8 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-8x8"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 9×9 ====== -->
-  <div class="sheet-panel" id="panel-9x9">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('9x9')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-9x9" onclick="toggleAnswers('9x9')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 9×9 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-9x9"></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== 10×10 ====== -->
-  <div class="sheet-panel" id="panel-10x10">
-    <div class="action-row">
-      <button class="btn btn-refresh" onclick="refreshSheet('10x10')">🔀 Refresh Numbers</button>
-      <button class="btn btn-answer" id="ans-10x10" onclick="toggleAnswers('10x10')">👁 Show Answers</button>
-    </div>
-    <div class="grid-card">
-      <div class="grid-title">📝 10×10 Addition Grid</div>
-      <div class="table-wrap">
-        <table id="table-10x10"></table>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /main -->
 
 <script>
-// ========================
-// UTILITY
-// ========================
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function randNDigit(n) {
+  if (n === 1) return rand(1, 9);
+  const min = Math.pow(10, n - 1);
+  const max = Math.pow(10, n) - 1;
+  return rand(min, max);
 }
 
-// ========================
-// DATA STORE
-// ========================
-const data = {};
-
-function genGrid(rows, cols) {
-  const grid = [];
-  for (let r = 0; r < rows; r++) {
-    grid[r] = [];
-    for (let c = 0; c < cols; c++) {
-      grid[r][c] = randInt(10, 99);
-    }
-  }
-  return grid;
+function digitLabel(n) {
+  return n + '-digit';
 }
 
-// ========================
-// RENDER FUNCTIONS
-// ========================
-
-// Basic addition: 10 rows (addends) × 10 columns (addends)
-// Table shows: top row = col numbers, left col = row numbers, cells = sum (answer)
-function renderBasic() {
-  const rows = data['basic'].rows; // 10 values
-  const cols = data['basic'].cols; // 10 values
-  const tbl = document.getElementById('table-basic');
-  const showAns = tbl.closest('.sheet-panel').classList.contains('answers-visible') ||
-    document.getElementById('panel-basic').classList.contains('answers-visible');
-
-  let html = '<thead><tr><th class="basic-label">+</th>';
-  for (let c = 0; c < 10; c++) html += `<th>${cols[c]}</th>`;
-  html += '</tr></thead><tbody>';
-
-  for (let r = 0; r < 10; r++) {
-    html += `<tr><th>${rows[r]}</th>`;
-    for (let c = 0; c < 10; c++) {
-      const sum = rows[r] + cols[c];
-      html += `<td class="num">${rows[r]}+${cols[c]}=<span class="answer-cell">${sum}</span><span class="blank-cell">?</span></td>`;
-    }
-    html += '</tr>';
-  }
-  html += '</tbody>';
-  tbl.innerHTML = html;
-}
-
-// NxN grid: random numbers in every cell, totals shown as ? until answers revealed
-function renderNxN(key, n) {
-  const grid = data[key].grid; // n×n array of random numbers
-  const tbl = document.getElementById('table-' + key);
-
-  // row totals and col totals
-  const rowTotals = grid.map(row => row.reduce((s, v) => s + v, 0));
-  const colTotals = Array.from({length: n}, (_, c) => grid.reduce((s, row) => s + row[c], 0));
-  const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
-
-  let html = '<thead><tr>';
-  html += `<th class="basic-label"></th>`;
-  for (let c = 0; c < n; c++) html += `<th class="basic-label">#${c+1}</th>`;
-  html += '<th class="basic-label">Total</th></tr></thead><tbody>';
-
-  for (let r = 0; r < n; r++) {
-    html += '<tr>';
-    html += `<th>${r+1}</th>`;
-    for (let c = 0; c < n; c++) {
-      html += `<td class="num">${grid[r][c]}</td>`;
-    }
-    html += `<td class="total-col"><span class="answer-cell">${rowTotals[r]}</span><span class="blank-cell">?</span></td>`;
-    html += '</tr>';
-  }
-
-  // Total row (col totals)
-  html += '<tr><th>Total</th>';
-  for (let c = 0; c < n; c++) {
-    html += `<td class="total-row"><span class="answer-cell">${colTotals[c]}</span><span class="blank-cell">?</span></td>`;
-  }
-  html += `<td class="total-corner"><span class="answer-cell">${grandTotal}</span><span class="blank-cell">?</span></td></tr>`;
-  html += '</tbody>';
-  tbl.innerHTML = html;
-}
-
-// ========================
-// INIT DATA & RENDER
-// ========================
-function initSheet(key, n) {
-  if (key === 'basic') {
-    data['basic'] = {
-      rows: Array.from({length: 10}, () => randInt(10, 99)),
-      cols: Array.from({length: 10}, () => randInt(10, 99))
-    };
-    renderBasic();
-  } else {
-    data[key] = {
-      grid: genGrid(n, n)
-    };
-    renderNxN(key, n);
-  }
-}
-
-function initAll() {
-  initSheet('basic', 10);
-  initSheet('5x5', 5);
-  initSheet('6x6', 6);
-  initSheet('7x7', 7);
-  initSheet('8x8', 8);
-  initSheet('9x9', 9);
-  initSheet('10x10', 10);
-}
-
-// ========================
-// REFRESH
-// ========================
-function refreshSheet(key) {
-  const sizes = { basic: 10, '5x5': 5, '6x6': 6, '7x7': 7, '8x8': 8, '9x9': 9, '10x10': 10 };
-  const n = sizes[key];
-
-  // Animate refresh
-  const tbl = document.getElementById('table-' + key);
-  tbl.style.opacity = '0.3';
-  tbl.style.transform = 'scale(0.97)';
-
-  setTimeout(() => {
-    initSheet(key, n);
-    // Reapply answer visibility
-    const panel = document.getElementById('panel-' + key);
-    if (panel.classList.contains('answers-visible')) {
-      // answers stay visible after refresh
-    }
-    tbl.style.opacity = '1';
-    tbl.style.transform = 'scale(1)';
-    tbl.style.transition = 'opacity 0.3s, transform 0.3s';
-    setTimeout(() => { tbl.style.transition = ''; }, 350);
-  }, 150);
-}
-
-// ========================
-// ANSWERS TOGGLE
-// ========================
-const answerState = {};
-
-function toggleAnswers(key) {
-  const panel = document.getElementById('panel-' + key);
-  const btn = document.getElementById('ans-' + key);
-
-  answerState[key] = !answerState[key];
-
-  if (answerState[key]) {
-    panel.classList.add('answers-visible');
-    btn.textContent = '🙈 Hide Answers';
-    btn.classList.add('showing');
-  } else {
-    panel.classList.remove('answers-visible');
-    btn.textContent = '👁 Show Answers';
-    btn.classList.remove('showing');
-  }
-}
-
-// ========================
-// TAB SWITCHING
-// ========================
-function showTab(key) {
-  document.querySelectorAll('.sheet-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-
-  document.getElementById('panel-' + key).classList.add('active');
-  const tabs = document.querySelectorAll('.tab');
-  const tabMap = ['basic', '5x5', '6x6', '7x7', '8x8', '9x9', '10x10'];
-  tabs[tabMap.indexOf(key)].classList.add('active');
-}
-
-// ========================
+// ══════════════════════════════════════════════
 // STOPWATCH
-// ========================
-let swInterval = null;
-let swMs = 0;
-let swRunning = false;
+// ══════════════════════════════════════════════
+let swMs = 0, swRunning = false, swTimer = null;
 
-function swFormat(ms) {
-  const mins = Math.floor(ms / 60000);
-  const secs = Math.floor((ms % 60000) / 1000);
-  const tenths = Math.floor((ms % 1000) / 100);
-  return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${tenths}`;
-}
-
-function swTick() {
-  swMs += 100;
-  document.getElementById('swDisplay').textContent = swFormat(swMs);
+function swFmt(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  const t = Math.floor((ms % 1000) / 100);
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${t}`;
 }
 
 function swToggle() {
-  const btn = document.getElementById('swBtn');
-  const display = document.getElementById('swDisplay');
-
+  const btn = document.getElementById('swStartBtn');
+  const disp = document.getElementById('swDisplay');
   if (!swRunning) {
     swRunning = true;
-    swInterval = setInterval(swTick, 100);
+    swTimer = setInterval(() => {
+      swMs += 100;
+      disp.textContent = swFmt(swMs);
+    }, 100);
     btn.textContent = '⏸ Pause';
-    btn.className = 'sw-btn sw-stop';
-    display.classList.add('running');
+    btn.classList.add('active');
+    disp.classList.add('run');
   } else {
     swRunning = false;
-    clearInterval(swInterval);
+    clearInterval(swTimer);
     btn.textContent = '▶ Resume';
-    btn.className = 'sw-btn sw-start';
-    display.classList.remove('running');
+    btn.classList.remove('active');
+    disp.classList.remove('run');
   }
 }
 
 function swReset() {
   swRunning = false;
-  clearInterval(swInterval);
+  clearInterval(swTimer);
   swMs = 0;
   document.getElementById('swDisplay').textContent = '00:00.0';
-  document.getElementById('swDisplay').classList.remove('running');
-  document.getElementById('swBtn').textContent = '▶ Start';
-  document.getElementById('swBtn').className = 'sw-btn sw-start';
+  document.getElementById('swDisplay').classList.remove('run');
+  document.getElementById('swStartBtn').textContent = '▶ Start';
+  document.getElementById('swStartBtn').classList.remove('active');
 }
 
-// ========================
+// ══════════════════════════════════════════════
+// OPERATION SWITCHING
+// ══════════════════════════════════════════════
+let currentOp = 'add';
+
+function switchOp(op) {
+  currentOp = op;
+  document.querySelectorAll('.op-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.op-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.op-tab.${op}`).classList.add('active');
+  document.getElementById('op-' + op).classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// ADDITION — NxN GRID SYSTEM
+// ══════════════════════════════════════════════
+const addSizes = [
+  { key: '5x5', label: '5×5', n: 5, range: [10, 99] },
+  { key: '6x6', label: '6×6', n: 6, range: [10, 99] },
+  { key: '7x7', label: '7×7', n: 7, range: [10, 99] },
+  { key: '8x8', label: '8×8', n: 8, range: [10, 99] },
+  { key: '9x9', label: '9×9', n: 9, range: [10, 99] },
+  { key: '10x10', label: '10×10', n: 10, range: [10, 99] },
+];
+
+let addCurrent = '5x5';
+let addData = {};
+let addAnsVisible = false;
+
+function addGenData(key) {
+  const cfg = addSizes.find(s => s.key === key);
+  const rows = Array.from({length: cfg.n}, () => rand(cfg.range[0], cfg.range[1]));
+  const cols = Array.from({length: cfg.n}, () => rand(cfg.range[0], cfg.range[1]));
+  addData[key] = { rows, cols, n: cfg.n };
+}
+
+function addRenderTable(key) {
+  const { rows, cols, n } = addData[key];
+  const wrap = document.getElementById('add-table-wrap');
+  const visible = addAnsVisible;
+
+  const rowTotals = rows.map(r => cols.reduce((s, c) => s + r + c, 0));
+  const colTotals = cols.map((c, ci) => rows.reduce((s, r) => s + r + c, 0));
+  const grand = rowTotals.reduce((a, b) => a + b, 0);
+
+  let html = `<table><thead><tr><th style="color:var(--muted);font-size:0.7rem">＋</th>`;
+  cols.forEach(c => { html += `<th>${c}</th>`; });
+  html += `<th style="color:var(--sub);font-size:0.7rem">Σ row</th></tr></thead><tbody>`;
+
+  rows.forEach((r, ri) => {
+    html += `<tr><th>${r}</th>`;
+    cols.forEach(c => {
+      const sum = r + c;
+      html += `<td>${r}+${c}=<span class="ans-span">${sum}</span><span class="blank-span">??</span></td>`;
+    });
+    html += `<td class="total-col"><span class="ans-span">${rowTotals[ri]}</span><span class="blank-span">???</span></td></tr>`;
+  });
+
+  html += `<tr><th style="color:var(--sub);font-size:0.7rem">Σ col</th>`;
+  cols.forEach((c, ci) => {
+    html += `<td class="total-row"><span class="ans-span">${colTotals[ci]}</span><span class="blank-span">???</span></td>`;
+  });
+  html += `<td class="total-corner"><span class="ans-span">${grand}</span><span class="blank-span">????</span></td></tr>`;
+  html += `</tbody></table>`;
+
+  wrap.innerHTML = html;
+  wrap.className = 'add-table-wrap' + (visible ? ' add-answers' : '');
+}
+
+function addSwitchTab(key) {
+  addCurrent = key;
+  document.querySelectorAll('#add-tab-bar .add-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`#add-tab-bar [data-key="${key}"]`).classList.add('active');
+  if (!addData[key]) addGenData(key);
+  addRenderTable(key);
+}
+
+function addRefresh() {
+  addGenData(addCurrent);
+  addRenderTable(addCurrent);
+}
+
+function addToggleAns() {
+  addAnsVisible = !addAnsVisible;
+  const btn = document.getElementById('add-ans-btn');
+  if (addAnsVisible) {
+    btn.textContent = '🙈 Hide Answers';
+    btn.className = 'tool-btn ans-hide';
+  } else {
+    btn.textContent = '👁 Show Answers';
+    btn.className = 'tool-btn ans-show';
+  }
+  addRenderTable(addCurrent);
+}
+
+function addInit() {
+  const bar = document.getElementById('add-tab-bar');
+  bar.innerHTML = '';
+  addSizes.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'add-tab' + (s.key === addCurrent ? ' active' : '');
+    btn.dataset.key = s.key;
+    btn.textContent = s.label;
+    btn.onclick = () => addSwitchTab(s.key);
+    bar.appendChild(btn);
+    addGenData(s.key);
+  });
+  addRenderTable(addCurrent);
+}
+
+// ══════════════════════════════════════════════
+// SUBTRACTION / MULTIPLICATION / DIVISION
+// ══════════════════════════════════════════════
+
+// SUB combos: minuend 3-6 digits, subtrahend 2-6 digits (subtrahend <= minuend digits)
+const subCombos = [];
+for (let m = 3; m <= 6; m++) {
+  for (let s = 2; s <= m; s++) {
+    subCombos.push({ a: m, b: s, key: `${m}x${s}` });
+  }
+}
+
+// MUL combos: 1-6 × 1-6
+const mulCombos = [];
+for (let a = 1; a <= 6; a++) {
+  for (let b = 1; b <= 6; b++) {
+    mulCombos.push({ a, b, key: `${a}x${b}` });
+  }
+}
+
+// DIV combos: dividend 2-6 digits, divisor 1-4 digits (divisor < dividend digits)
+const divCombos = [];
+for (let d = 2; d <= 6; d++) {
+  for (let v = 1; v < d && v <= 4; v++) {
+    divCombos.push({ a: d, b: v, key: `${d}x${v}` });
+  }
+}
+
+const opState = {
+  sub: { combos: subCombos, current: subCombos[0].key, ansVisible: false, data: {} },
+  mul: { combos: mulCombos, current: mulCombos[0].key, ansVisible: false, data: {} },
+  div: { combos: divCombos, current: divCombos[0].key, ansVisible: false, data: {} },
+};
+
+function opComboLabel(op, combo) {
+  if (op === 'sub') return `${combo.a}-digit − ${combo.b}-digit`;
+  if (op === 'mul') return `${combo.a}-digit × ${combo.b}-digit`;
+  if (op === 'div') return `${combo.a}-digit ÷ ${combo.b}-digit`;
+}
+
+function opBadge(op, combo) {
+  if (op === 'sub') return `${combo.a}d−${combo.b}d`;
+  if (op === 'mul') return `${combo.a}d×${combo.b}d`;
+  if (op === 'div') return `${combo.a}d÷${combo.b}d`;
+}
+
+function genQuestion(op, combo) {
+  if (op === 'sub') {
+    const a = randNDigit(combo.a);
+    // ensure subtrahend ≤ a
+    const bMax = Math.min(a, Math.pow(10, combo.b) - 1);
+    const bMin = Math.pow(10, combo.b - 1);
+    const b = bMin <= bMax ? rand(bMin, bMax) : rand(1, a);
+    return { a, b, ans: a - b };
+  }
+  if (op === 'mul') {
+    const a = randNDigit(combo.a);
+    const b = randNDigit(combo.b);
+    return { a, b, ans: a * b };
+  }
+  if (op === 'div') {
+    // generate clean division: pick divisor first, multiply to get dividend
+    const divisor = randNDigit(combo.b);
+    const minQ = Math.ceil(Math.pow(10, combo.a - 1) / divisor);
+    const maxQ = Math.floor((Math.pow(10, combo.a) - 1) / divisor);
+    if (minQ > maxQ) { return genQuestion(op, combo); } // retry
+    const quotient = rand(minQ, maxQ);
+    const dividend = divisor * quotient;
+    return { a: dividend, b: divisor, ans: quotient };
+  }
+}
+
+function calcCardCount(op, combo) {
+  // Estimate how many cards fit without overflow based on combo
+  // Wider numbers need fewer cards; aim for roughly 3-4 rows
+  const totalDigits = combo.a + combo.b;
+  // Wider → fewer per row
+  if (totalDigits >= 10) return 12;
+  if (totalDigits >= 8) return 16;
+  if (totalDigits >= 6) return 20;
+  return 24;
+}
+
+function genOpData(op, comboKey) {
+  const state = opState[op];
+  const combo = state.combos.find(c => c.key === comboKey);
+  const count = calcCardCount(op, combo);
+  const questions = Array.from({length: count}, () => genQuestion(op, combo));
+  state.data[comboKey] = { questions, combo };
+}
+
+function opSymbol(op) {
+  return { sub: '−', mul: '×', div: '÷' }[op];
+}
+
+function renderOpGrid(op) {
+  const state = opState[op];
+  const comboKey = state.current;
+  if (!state.data[comboKey]) genOpData(op, comboKey);
+  const { questions, combo } = state.data[comboKey];
+  const grid = document.getElementById(op + '-grid');
+  const visible = state.ansVisible;
+
+  const sym = opSymbol(op);
+  const symClass = op + '-sym';
+  const colorClass = op + '-c';
+
+  // Dynamic card min-width based on digit count
+  const maxDigits = Math.max(combo.a + combo.b, String(questions[0]?.ans || 0).length);
+  const minW = Math.max(120, maxDigits * 14 + 60);
+
+  let html = `<div class="q-grid" style="--card-min:${minW}px">`;
+  questions.forEach((q, i) => {
+    const revealed = visible ? 'revealed' : '';
+    html += `
+      <div class="q-card ${revealed}" style="min-width:${minW}px">
+        <div class="q-num">${q.a}</div>
+        <div class="q-op-line">
+          <span class="q-op-sym ${symClass}">${sym}</span>
+          <span class="q-second">${q.b}</span>
+        </div>
+        <div class="q-ans-line">
+          <span class="blank-span q-blank">_ _ _</span>
+          <span class="ans-span q-answer">${q.ans}</span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function opSwitchCombo(op, comboKey) {
+  const state = opState[op];
+  state.current = comboKey;
+  state.ansVisible = false;
+
+  // Update answer button
+  const btn = document.getElementById(op + '-ans-btn');
+  btn.textContent = '👁 Show Answers';
+  btn.className = 'tool-btn ans-show';
+
+  // Update sidebar
+  document.querySelectorAll(`#${op}-combo-list .combo-item`).forEach(el => {
+    el.classList.toggle('active', el.dataset.key === comboKey);
+  });
+
+  // Update toolbar
+  const combo = state.combos.find(c => c.key === comboKey);
+  document.getElementById(op + '-toolbar-title').textContent = opComboLabel(op, combo);
+  document.getElementById(op + '-toolbar-sub').textContent =
+    op === 'sub' ? `${combo.a}-digit number minus ${combo.b}-digit number` :
+    op === 'mul' ? `${combo.a}-digit × ${combo.b}-digit` :
+    `${combo.a}-digit ÷ ${combo.b}-digit (exact)`;
+
+  if (!state.data[comboKey]) genOpData(op, comboKey);
+  renderOpGrid(op);
+}
+
+function opRefresh(op) {
+  const state = opState[op];
+  genOpData(op, state.current);
+  renderOpGrid(op);
+}
+
+function opToggleAns(op) {
+  const state = opState[op];
+  state.ansVisible = !state.ansVisible;
+  const btn = document.getElementById(op + '-ans-btn');
+  if (state.ansVisible) {
+    btn.textContent = '🙈 Hide Answers';
+    btn.className = 'tool-btn ans-hide';
+  } else {
+    btn.textContent = '👁 Show Answers';
+    btn.className = 'tool-btn ans-show';
+  }
+  renderOpGrid(op);
+}
+
+function initOpSidebar(op) {
+  const state = opState[op];
+  const list = document.getElementById(op + '-combo-list');
+  list.innerHTML = '';
+  state.combos.forEach(combo => {
+    const item = document.createElement('div');
+    item.className = `combo-item ${op}-c` + (combo.key === state.current ? ' active' : '');
+    item.dataset.key = combo.key;
+    item.innerHTML = `
+      <span class="combo-badge">${opBadge(op, combo)}</span>
+      <span class="combo-label">${opComboLabel(op, combo)}</span>`;
+    item.onclick = () => opSwitchCombo(op, combo.key);
+    list.appendChild(item);
+  });
+
+  // Set initial toolbar
+  const combo = state.combos.find(c => c.key === state.current);
+  document.getElementById(op + '-toolbar-title').textContent = opComboLabel(op, combo);
+  document.getElementById(op + '-toolbar-sub').textContent =
+    op === 'sub' ? `${combo.a}-digit number minus ${combo.b}-digit number` :
+    op === 'mul' ? `${combo.a}-digit × ${combo.b}-digit` :
+    `${combo.a}-digit ÷ ${combo.b}-digit (exact)`;
+
+  genOpData(op, state.current);
+  renderOpGrid(op);
+}
+
+// ══════════════════════════════════════════════
 // BOOT
-// ========================
-window.addEventListener('DOMContentLoaded', initAll);
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  addInit();
+  initOpSidebar('sub');
+  initOpSidebar('mul');
+  initOpSidebar('div');
+});
 </script>
 </body>
 </html>
