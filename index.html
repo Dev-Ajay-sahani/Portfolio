@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Math Practice Suite</title>
+<link rel="icon" type="image/png" href="https://play-lh.googleusercontent.com/ibG8ub7bf9Os3Y1Ro56JX2W2De9DDr169-lMkIxskiTctnlc__Rt_xcl6OGhBeSAfgfb=w256">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -28,6 +29,10 @@
   --div: #a78bfa;
   --div-dim: #a78bfa22;
   --div-mid: #a78bfa55;
+
+  --sq: #fb923c;
+  --sq-dim: #fb923c22;
+  --sq-mid: #fb923c55;
 
   --text: #e8e8f0;
   --muted: #6666aa;
@@ -153,6 +158,7 @@ html, body {
 .op-tab.sub.active { color: var(--sub); border-bottom-color: var(--sub); }
 .op-tab.mul.active { color: var(--mul); border-bottom-color: var(--mul); }
 .op-tab.div.active { color: var(--div); border-bottom-color: var(--div); }
+.op-tab.sq.active  { color: var(--sq);  border-bottom-color: var(--sq);  }
 .op-icon { font-size: 1rem; }
 
 /* ══════════════════════════════════════
@@ -218,6 +224,7 @@ html, body {
 .combo-item.active.sub-c { background: var(--sub-dim); border-color: var(--sub-mid); }
 .combo-item.active.mul-c { background: var(--mul-dim); border-color: var(--mul-mid); }
 .combo-item.active.div-c { background: var(--div-dim); border-color: var(--div-mid); }
+.combo-item.active.sq-c  { background: var(--sq-dim);  border-color: var(--sq-mid);  }
 
 .combo-badge {
   font-family: var(--font-mono);
@@ -233,9 +240,22 @@ html, body {
 .sub-c .combo-badge { color: var(--sub); background: var(--sub-dim); }
 .mul-c .combo-badge { color: var(--mul); background: var(--mul-dim); }
 .div-c .combo-badge { color: var(--div); background: var(--div-dim); }
+.sq-c  .combo-badge { color: var(--sq);  background: var(--sq-dim);  }
 
 .combo-label { font-size: 0.78rem; color: var(--muted2); font-weight: 500; }
 .combo-item.active .combo-label { color: var(--text); font-weight: 600; }
+
+.sq-section-hdr {
+  padding: 10px 10px 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sq);
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.sq-section-hdr:first-child { border-top: none; margin-top: 0; }
 
 /* ══════════════════════════════════════
    CONTENT AREA
@@ -545,6 +565,7 @@ html, body {
     <button class="op-tab sub" onclick="switchOp('sub')"><span class="op-icon">➖</span>Subtraction</button>
     <button class="op-tab mul" onclick="switchOp('mul')"><span class="op-icon">✖️</span>Multiplication</button>
     <button class="op-tab div" onclick="switchOp('div')"><span class="op-icon">➗</span>Division</button>
+    <button class="op-tab sq"  onclick="switchOp('sq')"><span class="op-icon">🔢</span>Roots</button>
   </nav>
 
   <!-- ═══════════════ ADDITION PANEL ═══════════════ -->
@@ -626,6 +647,65 @@ html, body {
     </div>
   </section>
 
+  <!-- ═══════════════ ROOTS & POWERS PANEL ═══════════════ -->
+  <section class="op-panel" id="op-sq">
+    <aside class="sidebar">
+      <div class="sidebar-head">Mode</div>
+      <div class="combo-list" id="sq-combo-list">
+
+        <!-- x² Squares -->
+        <div class="sq-section-hdr">x² — Squares</div>
+        <div class="combo-item sq-c active" data-sqmode="sq2"  onclick="sqSwitchMode('sq2')"><span class="combo-badge" style="color:var(--sq);background:var(--sq-dim)">2d²</span><span class="combo-label">2-digit square</span></div>
+        <div class="combo-item sq-c" data-sqmode="sq3" onclick="sqSwitchMode('sq3')"><span class="combo-badge" style="color:var(--sq);background:var(--sq-dim)">3d²</span><span class="combo-label">3-digit square</span></div>
+        <div class="combo-item sq-c" data-sqmode="sq4" onclick="sqSwitchMode('sq4')"><span class="combo-badge" style="color:var(--sq);background:var(--sq-dim)">4d²</span><span class="combo-label">4-digit square</span></div>
+        <div class="combo-item sq-c" data-sqmode="sq5" onclick="sqSwitchMode('sq5')"><span class="combo-badge" style="color:var(--sq);background:var(--sq-dim)">5d²</span><span class="combo-label">5-digit square</span></div>
+        <div class="combo-item sq-c" data-sqmode="sq6" onclick="sqSwitchMode('sq6')"><span class="combo-badge" style="color:var(--sq);background:var(--sq-dim)">6d²</span><span class="combo-label">6-digit square</span></div>
+
+        <!-- x³ Cubes -->
+        <div class="sq-section-hdr" style="color:var(--mul)">x³ — Cubes</div>
+        <div class="combo-item sq-c" data-sqmode="cb2" onclick="sqSwitchMode('cb2')"><span class="combo-badge" style="color:var(--mul);background:var(--mul-dim)">2d³</span><span class="combo-label">2-digit cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cb3" onclick="sqSwitchMode('cb3')"><span class="combo-badge" style="color:var(--mul);background:var(--mul-dim)">3d³</span><span class="combo-label">3-digit cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cb4" onclick="sqSwitchMode('cb4')"><span class="combo-badge" style="color:var(--mul);background:var(--mul-dim)">4d³</span><span class="combo-label">4-digit cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cb5" onclick="sqSwitchMode('cb5')"><span class="combo-badge" style="color:var(--mul);background:var(--mul-dim)">5d³</span><span class="combo-label">5-digit cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cb6" onclick="sqSwitchMode('cb6')"><span class="combo-badge" style="color:var(--mul);background:var(--mul-dim)">6d³</span><span class="combo-label">6-digit cube</span></div>
+
+        <!-- √x Square Roots -->
+        <div class="sq-section-hdr" style="color:var(--add)">√x — Square Roots</div>
+        <div class="combo-item sq-c" data-sqmode="sqrt2" onclick="sqSwitchMode('sqrt2')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√2d</span><span class="combo-label">2-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt3" onclick="sqSwitchMode('sqrt3')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√3d</span><span class="combo-label">3-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt4" onclick="sqSwitchMode('sqrt4')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√4d</span><span class="combo-label">4-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt5" onclick="sqSwitchMode('sqrt5')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√5d</span><span class="combo-label">5-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt6" onclick="sqSwitchMode('sqrt6')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√6d</span><span class="combo-label">6-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt7" onclick="sqSwitchMode('sqrt7')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√7d</span><span class="combo-label">7-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt8" onclick="sqSwitchMode('sqrt8')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√8d</span><span class="combo-label">8-digit perfect sq</span></div>
+        <div class="combo-item sq-c" data-sqmode="sqrt9" onclick="sqSwitchMode('sqrt9')"><span class="combo-badge" style="color:var(--add);background:var(--add-dim)">√9d</span><span class="combo-label">9-digit perfect sq</span></div>
+
+        <!-- ∛x Cube Roots -->
+        <div class="sq-section-hdr" style="color:var(--div)">∛x — Cube Roots</div>
+        <div class="combo-item sq-c" data-sqmode="cbrt2" onclick="sqSwitchMode('cbrt2')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛2d</span><span class="combo-label">2-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt3" onclick="sqSwitchMode('cbrt3')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛3d</span><span class="combo-label">3-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt4" onclick="sqSwitchMode('cbrt4')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛4d</span><span class="combo-label">4-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt5" onclick="sqSwitchMode('cbrt5')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛5d</span><span class="combo-label">5-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt6" onclick="sqSwitchMode('cbrt6')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛6d</span><span class="combo-label">6-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt7" onclick="sqSwitchMode('cbrt7')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛7d</span><span class="combo-label">7-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt8" onclick="sqSwitchMode('cbrt8')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛8d</span><span class="combo-label">8-digit perfect cube</span></div>
+        <div class="combo-item sq-c" data-sqmode="cbrt9" onclick="sqSwitchMode('cbrt9')"><span class="combo-badge" style="color:var(--div);background:var(--div-dim)">∛9d</span><span class="combo-label">9-digit perfect cube</span></div>
+
+      </div>
+    </aside>
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title" id="sq-toolbar-title">2-digit Square</div>
+          <div class="toolbar-sub" id="sq-toolbar-sub">Find n² for each number</div>
+        </div>
+        <button class="tool-btn refresh" onclick="sqRefresh()" style="color:var(--sq);border-color:var(--sq-mid)">↻ Refresh</button>
+        <button class="tool-btn ans-show" id="sq-ans-btn" onclick="sqToggleAns()">👁 Show Answers</button>
+      </div>
+      <div class="grid-area" id="sq-grid"></div>
+    </div>
+  </section>
+
 </div>
 
 <script>
@@ -699,6 +779,8 @@ function switchOp(op) {
   document.querySelectorAll('.op-panel').forEach(p => p.classList.remove('active'));
   document.querySelector(`.op-tab.${op}`).classList.add('active');
   document.getElementById('op-' + op).classList.add('active');
+  // Roots panel: render on first switch (grid was hidden at boot)
+  if (op === 'sq') sqRenderGrid();
 }
 
 // ══════════════════════════════════════════════
@@ -1110,7 +1192,178 @@ window.addEventListener('DOMContentLoaded', () => {
   initOpSidebar('sub');
   initOpSidebar('mul');
   initOpSidebar('div');
+  sqInit();
 });
+
+// ══════════════════════════════════════════════
+// SQUARES & ROOTS
+// ══════════════════════════════════════════════
+
+let sqCurrentMode = 'sq2';
+let sqAnsVisible  = false;
+let sqData        = {};
+
+function sqParseMode(mode) {
+  // Returns { type: 'sq'|'cb'|'sqrt'|'cbrt', digits: number }
+  if (mode.startsWith('cbrt')) return { type: 'cbrt', digits: parseInt(mode.slice(4)) };
+  if (mode.startsWith('sqrt')) return { type: 'sqrt', digits: parseInt(mode.slice(4)) };
+  if (mode.startsWith('cb'))   return { type: 'cb',   digits: parseInt(mode.slice(2)) };
+  if (mode.startsWith('sq'))   return { type: 'sq',   digits: parseInt(mode.slice(2)) };
+  return { type: 'sq', digits: 2 };
+}
+
+function buildPool(min, max) {
+  const p = [];
+  for (let n = min; n <= max; n++) p.push(n);
+  return p;
+}
+
+function sqGenData(mode) {
+  const { type, digits } = sqParseMode(mode);
+  const lo = digits === 1 ? 1 : Math.pow(10, digits - 1);
+  const hi = Math.pow(10, digits) - 1;
+  let questions = [];
+
+  if (type === 'sq') {
+    // n-digit number → find n²
+    const pool = buildPool(lo, hi);
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 24);
+    questions = shuffled.map(n => ({ display: n, ans: n * n, type: 'sq' }));
+
+  } else if (type === 'cb') {
+    // n-digit number → find n³
+    const pool = buildPool(lo, hi);
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 24);
+    questions = shuffled.map(n => ({ display: n, ans: n * n * n, type: 'cb' }));
+
+  } else if (type === 'sqrt') {
+    // perfect squares whose value has 'digits' digits → find √
+    const rootLo = Math.ceil(Math.sqrt(lo));
+    const rootHi = Math.floor(Math.sqrt(hi));
+    if (rootLo > rootHi) { sqData[mode] = { questions: [], type }; return; }
+    const pool = buildPool(rootLo, rootHi);
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 24);
+    questions = shuffled.map(r => ({ display: r * r, ans: r, type: 'sqrt' }));
+
+  } else {
+    // cbrt: perfect cubes whose value has 'digits' digits → find ∛
+    const rootLo = Math.ceil(Math.cbrt(lo));
+    const rootHi = Math.floor(Math.cbrt(hi));
+    if (rootLo > rootHi) { sqData[mode] = { questions: [], type }; return; }
+    const pool = [];
+    for (let r = rootLo; r <= rootHi; r++) {
+      const cube = Math.round(r * r * r);
+      if (cube >= lo && cube <= hi) pool.push(r);
+    }
+    if (pool.length === 0) { sqData[mode] = { questions: [], type }; return; }
+    const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 24);
+    questions = shuffled.map(r => ({ display: Math.round(r * r * r), ans: r, type: 'cbrt' }));
+  }
+
+  sqData[mode] = { questions, type };
+}
+
+function sqRenderGrid() {
+  const mode = sqCurrentMode;
+  if (!sqData[mode]) sqGenData(mode);
+  const { questions, type } = sqData[mode];
+  const grid = document.getElementById('sq-grid');
+  if (!grid) return;
+  const visible = sqAnsVisible;
+
+  if (!questions || questions.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔢</div><div class="empty-text">No perfect values in this digit range</div></div>`;
+    return;
+  }
+
+  const maxLen = Math.max(...questions.map(q => String(q.display).length));
+  const minW   = Math.max(120, maxLen * 14 + 60);
+  const colorMap = { sq: 'var(--sq)', cb: 'var(--mul)', sqrt: 'var(--add)', cbrt: 'var(--div)' };
+  const color = colorMap[type] || 'var(--sq)';
+
+  let html = `<div class="q-grid">`;
+  questions.forEach(q => {
+    const revealed = visible ? 'revealed' : '';
+
+    if (type === 'sq' || type === 'cb') {
+      // Show n-digit number, find its power
+      const supLabel = type === 'sq' ? '²' : '³';
+      html += `
+        <div class="q-card ${revealed}" style="min-width:${minW}px">
+          <div class="q-num" style="font-size:1.3rem">${q.display}</div>
+          <div class="q-op-line">
+            <span class="q-op-sym" style="color:${color};font-size:0.8rem;vertical-align:super">${supLabel}</span>
+            <span class="q-second" style="color:var(--muted);font-size:0.8rem">= ?</span>
+          </div>
+          <div class="q-ans-line">
+            <span class="blank-span q-blank">_ _ _</span>
+            <span class="ans-span q-answer" style="color:${color}">${q.ans}</span>
+          </div>
+        </div>`;
+    } else {
+      // Show the value, find the root
+      const prefix = type === 'sqrt' ? '√' : '∛';
+      html += `
+        <div class="q-card ${revealed}" style="min-width:${minW}px">
+          <div class="q-op-line" style="border-top:none;padding-top:0;justify-content:center;gap:4px">
+            <span style="font-size:1.3rem;color:${color};font-family:var(--font-mono)">${prefix}</span>
+            <span class="q-num" style="font-size:1.15rem">${q.display}</span>
+          </div>
+          <div style="text-align:right;color:var(--muted);font-size:0.8rem;padding:2px 0 3px">= ?</div>
+          <div class="q-ans-line">
+            <span class="blank-span q-blank">_ _ _</span>
+            <span class="ans-span q-answer" style="color:${color}">${q.ans}</span>
+          </div>
+        </div>`;
+    }
+  });
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function sqSwitchMode(mode) {
+  sqCurrentMode = mode;
+  sqAnsVisible  = false;
+  const btn = document.getElementById('sq-ans-btn');
+  btn.textContent = '👁 Show Answers';
+  btn.className   = 'tool-btn ans-show';
+
+  document.querySelectorAll('#sq-combo-list .combo-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.sqmode === mode);
+  });
+
+  const { type, digits } = sqParseMode(mode);
+  const titleMap = {
+    sq:   [`${digits}-digit Squares`,    `Find n² for each ${digits}-digit number`],
+    cb:   [`${digits}-digit Cubes`,      `Find n³ for each ${digits}-digit number`],
+    sqrt: [`${digits}-digit Square Root`, `Find √n — perfect squares only`],
+    cbrt: [`${digits}-digit Cube Root`,   `Find ∛n — perfect cubes only`],
+  };
+  document.getElementById('sq-toolbar-title').textContent = titleMap[type][0];
+  document.getElementById('sq-toolbar-sub').textContent   = titleMap[type][1];
+
+  if (!sqData[mode]) sqGenData(mode);
+  sqRenderGrid();
+}
+
+function sqRefresh() {
+  sqGenData(sqCurrentMode);
+  sqRenderGrid();
+}
+
+function sqToggleAns() {
+  sqAnsVisible = !sqAnsVisible;
+  const btn = document.getElementById('sq-ans-btn');
+  btn.textContent = sqAnsVisible ? '🙈 Hide Answers' : '👁 Show Answers';
+  btn.className   = sqAnsVisible ? 'tool-btn ans-hide' : 'tool-btn ans-show';
+  sqRenderGrid();
+}
+
+function sqInit() {
+  sqGenData(sqCurrentMode);
+  // don't render yet — panel is hidden, render on first switchOp call
+  // but pre-load data so first click is instant
+}
 </script>
 </body>
 </html>
