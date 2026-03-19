@@ -166,6 +166,9 @@ html, body {
   overflow: hidden;
 }
 .op-panel.active { display: grid; }
+/* Addition has no sidebar — full width */
+#op-add.active { display: flex; flex-direction: column; }
+#op-add.active > .content-area { flex: 1; overflow: hidden; }
 
 /* ══════════════════════════════════════
    SIDEBAR — combination picker
@@ -444,28 +447,33 @@ html, body {
 .add-table-wrap table {
   border-collapse: separate;
   border-spacing: 4px;
+  width: 100%;
+  table-layout: fixed;
 }
 .add-table-wrap th {
   background: var(--card);
   color: var(--add);
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  padding: 6px 10px;
+  padding: 6px 4px;
   border-radius: 6px;
   text-align: center;
-  min-width: 42px;
+  min-width: 36px;
   font-weight: 700;
 }
 .add-table-wrap td {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 6px 10px;
-  text-align: right;
+  padding: 6px 4px;
+  text-align: center;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text);
-  min-width: 80px;
+  min-width: 36px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .add-table-wrap td.total-col {
   background: var(--add-dim);
@@ -545,7 +553,7 @@ html, body {
       <div class="content-toolbar">
         <div>
           <div class="toolbar-title">Addition Grids</div>
-          <div class="toolbar-sub">Row + Column = ?</div>
+          <div class="toolbar-sub" id="add-toolbar-sub">Row header + Column header = ?</div>
         </div>
         <button class="tool-btn refresh" onclick="addRefresh()">↻ Refresh</button>
         <button class="tool-btn ans-show" id="add-ans-btn" onclick="addToggleAns()">👁 Show Answers</button>
@@ -694,56 +702,90 @@ function switchOp(op) {
 }
 
 // ══════════════════════════════════════════════
-// ADDITION — NxN GRID SYSTEM
+// ADDITION — TWO MODES:
+//   'basic' = row-header + col-header lookup table (row + col = ?)
+//   NxN     = pure number grid, sum each row & col
 // ══════════════════════════════════════════════
 const addSizes = [
-  { key: '5x5', label: '5×5', n: 5, range: [10, 99] },
-  { key: '6x6', label: '6×6', n: 6, range: [10, 99] },
-  { key: '7x7', label: '7×7', n: 7, range: [10, 99] },
-  { key: '8x8', label: '8×8', n: 8, range: [10, 99] },
-  { key: '9x9', label: '9×9', n: 9, range: [10, 99] },
-  { key: '10x10', label: '10×10', n: 10, range: [10, 99] },
+  { key: 'basic', label: 'Basic', mode: 'basic', rows: 10, cols: 10 },
+  { key: '5x5',   label: '5×5',   mode: 'grid',  n: 5  },
+  { key: '6x6',   label: '6×6',   mode: 'grid',  n: 6  },
+  { key: '7x7',   label: '7×7',   mode: 'grid',  n: 7  },
+  { key: '8x8',   label: '8×8',   mode: 'grid',  n: 8  },
+  { key: '9x9',   label: '9×9',   mode: 'grid',  n: 9  },
+  { key: '10x10', label: '10×10', mode: 'grid',  n: 10 },
 ];
 
-let addCurrent = '5x5';
+let addCurrent = 'basic';
 let addData = {};
 let addAnsVisible = false;
 
 function addGenData(key) {
   const cfg = addSizes.find(s => s.key === key);
-  const rows = Array.from({length: cfg.n}, () => rand(cfg.range[0], cfg.range[1]));
-  const cols = Array.from({length: cfg.n}, () => rand(cfg.range[0], cfg.range[1]));
-  addData[key] = { rows, cols, n: cfg.n };
+  if (cfg.mode === 'basic') {
+    // Row headers and column headers — cells = row + col
+    addData[key] = {
+      mode: 'basic',
+      rowHeaders: Array.from({length: cfg.rows}, () => rand(10, 99)),
+      colHeaders: Array.from({length: cfg.cols}, () => rand(10, 99)),
+    };
+  } else {
+    // Pure number grid — just random values to sum across rows and down cols
+    const grid = Array.from({length: cfg.n}, () =>
+      Array.from({length: cfg.n}, () => rand(10, 99))
+    );
+    addData[key] = { mode: 'grid', grid, n: cfg.n };
+  }
 }
 
 function addRenderTable(key) {
-  const { rows, cols, n } = addData[key];
+  const d = addData[key];
   const wrap = document.getElementById('add-table-wrap');
   const visible = addAnsVisible;
+  let html = '';
 
-  const rowTotals = rows.map(r => cols.reduce((s, c) => s + r + c, 0));
-  const colTotals = cols.map((c, ci) => rows.reduce((s, r) => s + r + c, 0));
-  const grand = rowTotals.reduce((a, b) => a + b, 0);
-
-  let html = `<table><thead><tr><th style="color:var(--muted);font-size:0.7rem">＋</th>`;
-  cols.forEach(c => { html += `<th>${c}</th>`; });
-  html += `<th style="color:var(--sub);font-size:0.7rem">Σ row</th></tr></thead><tbody>`;
-
-  rows.forEach((r, ri) => {
-    html += `<tr><th>${r}</th>`;
-    cols.forEach(c => {
-      const sum = r + c;
-      html += `<td>${r}+${c}=<span class="ans-span">${sum}</span><span class="blank-span">??</span></td>`;
+  if (d.mode === 'basic') {
+    // ── BASIC: row-header × col-header lookup ──
+    const { rowHeaders: rH, colHeaders: cH } = d;
+    html += `<table><thead><tr>`;
+    html += `<th style="color:var(--add);font-size:0.85rem;font-weight:900">＋</th>`;
+    cH.forEach(c => { html += `<th>${c}</th>`; });
+    html += `</tr></thead><tbody>`;
+    rH.forEach(r => {
+      html += `<tr><th>${r}</th>`;
+      cH.forEach(c => {
+        html += `<td><span class="ans-span">${r + c}</span><span class="blank-span">?</span></td>`;
+      });
+      html += `</tr>`;
     });
-    html += `<td class="total-col"><span class="ans-span">${rowTotals[ri]}</span><span class="blank-span">???</span></td></tr>`;
-  });
+    html += `</tbody></table>`;
 
-  html += `<tr><th style="color:var(--sub);font-size:0.7rem">Σ col</th>`;
-  cols.forEach((c, ci) => {
-    html += `<td class="total-row"><span class="ans-span">${colTotals[ci]}</span><span class="blank-span">???</span></td>`;
-  });
-  html += `<td class="total-corner"><span class="ans-span">${grand}</span><span class="blank-span">????</span></td></tr>`;
-  html += `</tbody></table>`;
+  } else {
+    // ── NxN GRID: sum rows and cols ──
+    const { grid, n } = d;
+    const rowTotals = grid.map(row => row.reduce((s, v) => s + v, 0));
+    const colTotals = Array.from({length: n}, (_, ci) => grid.reduce((s, row) => s + row[ci], 0));
+    const grand = rowTotals.reduce((a, b) => a + b, 0);
+
+    html += `<table><thead><tr>`;
+    html += `<th style="color:var(--muted);font-size:0.7rem">#</th>`;
+    for (let c = 0; c < n; c++) html += `<th style="color:var(--muted);font-size:0.7rem">C${c+1}</th>`;
+    html += `<th style="color:var(--add);font-size:0.7rem">Σ row</th></tr></thead><tbody>`;
+
+    grid.forEach((row, ri) => {
+      html += `<tr><th style="color:var(--muted);font-size:0.7rem">R${ri+1}</th>`;
+      row.forEach(v => { html += `<td>${v}</td>`; });
+      html += `<td class="total-col"><span class="ans-span">${rowTotals[ri]}</span><span class="blank-span">?</span></td>`;
+      html += `</tr>`;
+    });
+
+    html += `<tr><th style="color:var(--sub);font-size:0.7rem">Σ col</th>`;
+    colTotals.forEach(ct => {
+      html += `<td class="total-row"><span class="ans-span">${ct}</span><span class="blank-span">?</span></td>`;
+    });
+    html += `<td class="total-corner"><span class="ans-span">${grand}</span><span class="blank-span">?</span></td></tr>`;
+    html += `</tbody></table>`;
+  }
 
   wrap.innerHTML = html;
   wrap.className = 'add-table-wrap' + (visible ? ' add-answers' : '');
@@ -751,8 +793,17 @@ function addRenderTable(key) {
 
 function addSwitchTab(key) {
   addCurrent = key;
+  addAnsVisible = false;
+  const btn = document.getElementById('add-ans-btn');
+  btn.textContent = '👁 Show Answers';
+  btn.className = 'tool-btn ans-show';
   document.querySelectorAll('#add-tab-bar .add-tab').forEach(t => t.classList.remove('active'));
   document.querySelector(`#add-tab-bar [data-key="${key}"]`).classList.add('active');
+  const cfg = addSizes.find(s => s.key === key);
+  document.getElementById('add-toolbar-sub').textContent =
+    cfg.mode === 'basic'
+      ? `Row header + Column header = ?  (10×10 lookup table)`
+      : `Sum each row → Total, sum each col → Total  (${cfg.n}×${cfg.n} grid)`;
   if (!addData[key]) addGenData(key);
   addRenderTable(key);
 }
@@ -802,19 +853,29 @@ for (let m = 3; m <= 6; m++) {
   }
 }
 
-// MUL combos: 1-6 × 1-6
+// MUL combos: unique only — larger × smaller (a >= b), no duplicates like 2×3 vs 3×2
 const mulCombos = [];
 for (let a = 1; a <= 6; a++) {
-  for (let b = 1; b <= 6; b++) {
+  for (let b = 1; b <= a; b++) {
     mulCombos.push({ a, b, key: `${a}x${b}` });
   }
 }
 
-// DIV combos: dividend 2-6 digits, divisor 1-4 digits (divisor < dividend digits)
+// DIV combos: two groups interleaved by dividend size
+// Group A (normal): dividend > divisor → quotient ≥ 1
+// Group B (reverse): dividend < divisor → quotient 0.xxx
+// Layout: all normal combos first, then all reverse combos
 const divCombos = [];
+// Normal: d-digit ÷ v-digit where d > v
 for (let d = 2; d <= 6; d++) {
-  for (let v = 1; v < d && v <= 4; v++) {
-    divCombos.push({ a: d, b: v, key: `${d}x${v}` });
+  for (let v = 1; v < d; v++) {
+    divCombos.push({ a: d, b: v, key: `${d}d${v}`, small: false });
+  }
+}
+// Reverse: d-digit ÷ v-digit where d < v (quotient = 0.xxx)
+for (let d = 1; d <= 5; d++) {
+  for (let v = d + 1; v <= 6; v++) {
+    divCombos.push({ a: d, b: v, key: `r${d}d${v}`, small: true });
   }
 }
 
@@ -827,7 +888,10 @@ const opState = {
 function opComboLabel(op, combo) {
   if (op === 'sub') return `${combo.a}-digit − ${combo.b}-digit`;
   if (op === 'mul') return `${combo.a}-digit × ${combo.b}-digit`;
-  if (op === 'div') return `${combo.a}-digit ÷ ${combo.b}-digit`;
+  if (op === 'div') {
+    if (combo.small) return `${combo.a}-digit ÷ ${combo.b}-digit  (0.xxx)`;
+    return `${combo.a}-digit ÷ ${combo.b}-digit`;
+  }
 }
 
 function opBadge(op, combo) {
@@ -839,26 +903,48 @@ function opBadge(op, combo) {
 function genQuestion(op, combo) {
   if (op === 'sub') {
     const a = randNDigit(combo.a);
-    // ensure subtrahend ≤ a
     const bMax = Math.min(a, Math.pow(10, combo.b) - 1);
     const bMin = Math.pow(10, combo.b - 1);
     const b = bMin <= bMax ? rand(bMin, bMax) : rand(1, a);
     return { a, b, ans: a - b };
   }
   if (op === 'mul') {
-    const a = randNDigit(combo.a);
-    const b = randNDigit(combo.b);
-    return { a, b, ans: a * b };
+    // combo.a >= combo.b always; show larger on top
+    const top = randNDigit(combo.a);
+    const bot = randNDigit(combo.b);
+    return { a: top, b: bot, ans: top * bot };
   }
   if (op === 'div') {
-    // generate clean division: pick divisor first, multiply to get dividend
+    // Reverse combo: dividend < divisor → quotient always 0.xxx
+    if (combo.small) {
+      const dividend = randNDigit(combo.a);
+      const divisor  = randNDigit(combo.b);
+      const ans = parseFloat((dividend / divisor).toFixed(4));
+      return { a: dividend, b: divisor, ans, decimal: true };
+    }
+
+    // Normal combo: dividend > divisor → quotient ≥ 1
     const divisor = randNDigit(combo.b);
-    const minQ = Math.ceil(Math.pow(10, combo.a - 1) / divisor);
-    const maxQ = Math.floor((Math.pow(10, combo.a) - 1) / divisor);
-    if (minQ > maxQ) { return genQuestion(op, combo); } // retry
-    const quotient = rand(minQ, maxQ);
-    const dividend = divisor * quotient;
-    return { a: dividend, b: divisor, ans: quotient };
+    const isDecimal = Math.random() < 0.6;
+
+    if (isDecimal) {
+      const minQ = Math.ceil(Math.pow(10, combo.a - 1) / divisor);
+      const maxQ = Math.floor((Math.pow(10, combo.a) - 1) / divisor);
+      if (minQ > maxQ) return genQuestion(op, combo);
+      const baseQ = rand(minQ, maxQ);
+      const remainder = rand(1, divisor - 1 > 0 ? divisor - 1 : 1);
+      const dividend = divisor * baseQ + remainder;
+      if (String(dividend).length !== combo.a) return genQuestion(op, combo);
+      const exactAns = parseFloat((dividend / divisor).toFixed(2));
+      return { a: dividend, b: divisor, ans: exactAns, decimal: true };
+    } else {
+      const minQ = Math.ceil(Math.pow(10, combo.a - 1) / divisor);
+      const maxQ = Math.floor((Math.pow(10, combo.a) - 1) / divisor);
+      if (minQ > maxQ) return genQuestion(op, combo);
+      const quotient = rand(minQ, maxQ);
+      const dividend = divisor * quotient;
+      return { a: dividend, b: divisor, ans: quotient, decimal: false };
+    }
   }
 }
 
@@ -895,17 +981,20 @@ function renderOpGrid(op) {
 
   const sym = opSymbol(op);
   const symClass = op + '-sym';
-  const colorClass = op + '-c';
 
   // Dynamic card min-width based on digit count
   const maxDigits = Math.max(combo.a + combo.b, String(questions[0]?.ans || 0).length);
-  const minW = Math.max(120, maxDigits * 14 + 60);
+  const minW = Math.max(130, maxDigits * 13 + 60);
 
-  let html = `<div class="q-grid" style="--card-min:${minW}px">`;
-  questions.forEach((q, i) => {
+  let html = `<div class="q-grid">`;
+  questions.forEach((q) => {
     const revealed = visible ? 'revealed' : '';
+    const decTag = (op === 'div' && q.decimal)
+      ? `<span style="font-size:0.6rem;color:var(--div);opacity:0.7;font-family:var(--font-ui);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px;align-self:flex-start">≈ decimal</span>`
+      : '';
     html += `
       <div class="q-card ${revealed}" style="min-width:${minW}px">
+        ${decTag}
         <div class="q-num">${q.a}</div>
         <div class="q-op-line">
           <span class="q-op-sym ${symClass}">${sym}</span>
@@ -940,9 +1029,10 @@ function opSwitchCombo(op, comboKey) {
   const combo = state.combos.find(c => c.key === comboKey);
   document.getElementById(op + '-toolbar-title').textContent = opComboLabel(op, combo);
   document.getElementById(op + '-toolbar-sub').textContent =
-    op === 'sub' ? `${combo.a}-digit number minus ${combo.b}-digit number` :
+    op === 'sub' ? `${combo.a}-digit minus ${combo.b}-digit` :
     op === 'mul' ? `${combo.a}-digit × ${combo.b}-digit` :
-    `${combo.a}-digit ÷ ${combo.b}-digit (exact)`;
+    combo.small ? `${combo.a}-digit ÷ ${combo.b}-digit  •  quotient always 0.xxxx` :
+    `${combo.a}-digit ÷ ${combo.b}-digit  •  ~60% decimal quotients`;
 
   if (!state.data[comboKey]) genOpData(op, comboKey);
   renderOpGrid(op);
@@ -972,7 +1062,23 @@ function initOpSidebar(op) {
   const state = opState[op];
   const list = document.getElementById(op + '-combo-list');
   list.innerHTML = '';
+  let addedDivider = false;
+  // For division, add a header for normal combos first
+  if (op === 'div') {
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'padding:6px 10px 4px;font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--add);opacity:0.8;';
+    hdr.textContent = '≥1  Quotient';
+    list.appendChild(hdr);
+  }
   state.combos.forEach(combo => {
+    // For division, insert a section header when we hit the first reverse (small) combo
+    if (op === 'div' && combo.small && !addedDivider) {
+      addedDivider = true;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'padding:8px 10px 4px;font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--div);opacity:0.7;border-top:1px solid var(--border);margin-top:4px;';
+      sep.textContent = '0.xxx  Quotient';
+      list.appendChild(sep);
+    }
     const item = document.createElement('div');
     item.className = `combo-item ${op}-c` + (combo.key === state.current ? ' active' : '');
     item.dataset.key = combo.key;
@@ -987,9 +1093,10 @@ function initOpSidebar(op) {
   const combo = state.combos.find(c => c.key === state.current);
   document.getElementById(op + '-toolbar-title').textContent = opComboLabel(op, combo);
   document.getElementById(op + '-toolbar-sub').textContent =
-    op === 'sub' ? `${combo.a}-digit number minus ${combo.b}-digit number` :
+    op === 'sub' ? `${combo.a}-digit minus ${combo.b}-digit` :
     op === 'mul' ? `${combo.a}-digit × ${combo.b}-digit` :
-    `${combo.a}-digit ÷ ${combo.b}-digit (exact)`;
+    combo.small ? `${combo.a}-digit ÷ ${combo.b}-digit  •  quotient always 0.xxxx` :
+    `${combo.a}-digit ÷ ${combo.b}-digit  •  ~60% decimal quotients`;
 
   genOpData(op, state.current);
   renderOpGrid(op);
