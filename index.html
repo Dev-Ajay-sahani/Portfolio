@@ -72,18 +72,19 @@ html, body {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 0 20px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  background: #111118;
+  border-bottom: 1px solid #222234;
   z-index: 50;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.4);
 }
 
 .logo {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--text);
+  letter-spacing: 3px;
+  color: #ffffff;
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -92,44 +93,49 @@ html, body {
 .sw-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-left: auto;
 }
 
 .sw-time {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text);
-  min-width: 90px;
-  letter-spacing: 1px;
+  color: #ffffff;
+  min-width: 100px;
+  letter-spacing: 2px;
+  background: #1a1a28;
+  padding: 4px 14px;
+  border-radius: 8px;
+  border: 1px solid #2e2e48;
+  text-align: center;
 }
-.sw-time.run { color: var(--add); }
+.sw-time.run { color: var(--add); border-color: var(--add-mid); }
 
 .sw-btn {
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  padding: 5px 12px;
-  background: transparent;
-  color: var(--muted2);
+  border: 1.5px solid #2e2e48;
+  border-radius: 8px;
+  padding: 6px 14px;
+  background: #1a1a28;
+  color: #9999bb;
   cursor: pointer;
   transition: all 0.15s;
   text-transform: uppercase;
 }
-.sw-btn:hover { color: var(--text); border-color: var(--muted2); }
-.sw-btn.active { color: var(--add); border-color: var(--add); }
+.sw-btn:hover { color: #ffffff; border-color: #9999bb; background: #22223a; }
+.sw-btn.active { color: var(--add); border-color: var(--add); background: var(--add-dim); }
 
 /* ══════════════════════════════════════
    OPERATION TABS
 ══════════════════════════════════════ */
 .op-tabs {
   display: flex;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  background: #111118;
+  border-bottom: 1px solid #222234;
   padding: 0 8px;
   gap: 2px;
   align-items: stretch;
@@ -140,26 +146,26 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  font-size: 0.82rem;
+  gap: 8px;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #555577;
   border: none;
   border-bottom: 3px solid transparent;
   background: transparent;
   cursor: pointer;
   transition: all 0.2s;
-  padding: 0 12px;
+  padding: 0 16px;
 }
-.op-tab:hover { color: var(--text); }
-.op-tab.add.active { color: var(--add); border-bottom-color: var(--add); }
-.op-tab.sub.active { color: var(--sub); border-bottom-color: var(--sub); }
-.op-tab.mul.active { color: var(--mul); border-bottom-color: var(--mul); }
-.op-tab.div.active { color: var(--div); border-bottom-color: var(--div); }
-.op-tab.sq.active  { color: var(--sq);  border-bottom-color: var(--sq);  }
-.op-icon { font-size: 1rem; }
+.op-tab:hover { color: #ffffff; background: #16161f; }
+.op-tab.add.active { color: var(--add); border-bottom-color: var(--add); background: #0a1f1a; }
+.op-tab.sub.active { color: var(--sub); border-bottom-color: var(--sub); background: #1f0d0d; }
+.op-tab.mul.active { color: var(--mul); border-bottom-color: var(--mul); background: #1f1a08; }
+.op-tab.div.active { color: var(--div); border-bottom-color: var(--div); background: #150f2a; }
+.op-tab.sq.active  { color: var(--sq);  border-bottom-color: var(--sq);  background: #1f1208; }
+.op-icon { font-size: 1.1rem; }
 
 /* ══════════════════════════════════════
    OPERATION PANELS
@@ -180,8 +186,8 @@ html, body {
    SIDEBAR — combination picker
 ══════════════════════════════════════ */
 .sidebar {
-  background: var(--panel);
-  border-right: 1px solid var(--border);
+  background: #111118;
+  border-right: 1px solid #222234;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -191,10 +197,10 @@ html, body {
   padding: 14px 16px 10px;
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--muted);
-  border-bottom: 1px solid var(--border);
+  color: #555577;
+  border-bottom: 1px solid #222234;
   flex-shrink: 0;
 }
 
@@ -203,35 +209,35 @@ html, body {
   overflow-y: auto;
   padding: 8px;
   scrollbar-width: thin;
-  scrollbar-color: var(--border2) transparent;
+  scrollbar-color: #2e2e48 transparent;
 }
 .combo-list::-webkit-scrollbar { width: 4px; }
-.combo-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.combo-list::-webkit-scrollbar-thumb { background: #2e2e48; border-radius: 4px; }
 
 .combo-item {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s;
   margin-bottom: 2px;
 }
-.combo-item:hover { background: var(--card); border-color: var(--border); }
-.combo-item.active.add-c { background: var(--add-dim); border-color: var(--add-mid); }
-.combo-item.active.sub-c { background: var(--sub-dim); border-color: var(--sub-mid); }
-.combo-item.active.mul-c { background: var(--mul-dim); border-color: var(--mul-mid); }
-.combo-item.active.div-c { background: var(--div-dim); border-color: var(--div-mid); }
-.combo-item.active.sq-c  { background: var(--sq-dim);  border-color: var(--sq-mid);  }
+.combo-item:hover { background: #1a1a28; border-color: #2e2e48; }
+.combo-item.active.add-c { background: #0a1f1a; border-color: var(--add-mid); }
+.combo-item.active.sub-c { background: #1f0d0d; border-color: var(--sub-mid); }
+.combo-item.active.mul-c { background: #1f1a08; border-color: var(--mul-mid); }
+.combo-item.active.div-c { background: #150f2a; border-color: var(--div-mid); }
+.combo-item.active.sq-c  { background: #1f1208; border-color: var(--sq-mid);  }
 
 .combo-badge {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 7px;
+  border-radius: 5px;
   flex-shrink: 0;
   min-width: 52px;
   text-align: center;
@@ -242,8 +248,8 @@ html, body {
 .div-c .combo-badge { color: var(--div); background: var(--div-dim); }
 .sq-c  .combo-badge { color: var(--sq);  background: var(--sq-dim);  }
 
-.combo-label { font-size: 0.78rem; color: var(--muted2); font-weight: 500; }
-.combo-item.active .combo-label { color: var(--text); font-weight: 600; }
+.combo-label { font-size: 0.8rem; color: #9999bb; font-weight: 500; }
+.combo-item.active .combo-label { color: #ffffff; font-weight: 600; }
 
 .sq-section-hdr {
   padding: 10px 10px 4px;
@@ -252,7 +258,7 @@ html, body {
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--sq);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #222234;
   margin-top: 4px;
 }
 .sq-section-hdr:first-child { border-top: none; margin-top: 0; }
@@ -264,58 +270,58 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg);
+  background: #0f0f14;
 }
 
 .content-toolbar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--panel);
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #222234;
+  background: #111118;
   flex-shrink: 0;
 }
 
 .toolbar-title {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text);
+  color: #ffffff;
   flex: 1;
 }
 .toolbar-sub {
-  font-size: 0.72rem;
-  color: var(--muted);
+  font-size: 0.75rem;
+  color: #555577;
   font-weight: 500;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .tool-btn {
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.3px;
   text-transform: uppercase;
   border-radius: 8px;
-  border: 1px solid var(--border2);
-  padding: 6px 14px;
-  background: var(--card);
-  color: var(--muted2);
+  border: 1.5px solid #2e2e48;
+  padding: 7px 16px;
+  background: #1a1a28;
+  color: #9999bb;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   flex-shrink: 0;
 }
-.tool-btn:hover { color: var(--text); border-color: var(--muted2); }
+.tool-btn:hover { color: #ffffff; border-color: #9999bb; background: #22223a; }
 .tool-btn:active { transform: scale(0.96); }
 .tool-btn.refresh { color: var(--add); border-color: var(--add-mid); }
-.tool-btn.refresh:hover { background: var(--add-dim); }
+.tool-btn.refresh:hover { background: var(--add-dim); border-color: var(--add); }
 .tool-btn.ans-show { color: var(--mul); border-color: var(--mul-mid); }
-.tool-btn.ans-show:hover { background: var(--mul-dim); }
+.tool-btn.ans-show:hover { background: var(--mul-dim); border-color: var(--mul); }
 .tool-btn.ans-hide { color: var(--green); border-color: #4ade8055; }
-.tool-btn.ans-hide:hover { background: #4ade8022; }
+.tool-btn.ans-hide:hover { background: #4ade8022; border-color: var(--green); }
 
 /* Score display */
 .score-pill {
@@ -351,75 +357,104 @@ html, body {
 
 /* ——————————————————
    QUESTION CARDS LAYOUT
-   Flex-wrap grid that fills width, no overflow-y
 —————————————————— */
 .q-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   align-content: flex-start;
   overflow: hidden;
   flex: 1;
 }
 
 .q-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 14px;
+  background: #1a1a28;
+  border: 1.5px solid #2e2e48;
+  border-radius: 14px;
+  padding: 14px 18px 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
-  min-width: 140px;
+  gap: 0;
+  min-width: 150px;
   flex: 1;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.q-card:hover { border-color: var(--border2); }
-.q-card.revealed { border-color: var(--green); background: #4ade8008; }
+.q-card:hover {
+  border-color: #44446a;
+  background: #1e1e30;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.q-card.revealed {
+  border-color: var(--green);
+  background: #0d2016;
+  box-shadow: 0 2px 12px rgba(74,222,128,0.15);
+}
 
+/* Number on top — large, bright white */
 .q-num {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
-  color: var(--text);
-  letter-spacing: 0.5px;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  width: 100%;
+  text-align: right;
 }
+
+/* Operator row — symbol + second number */
 .q-op-line {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   justify-content: flex-end;
-  border-top: 1px solid var(--border);
-  padding-top: 3px;
-  margin-top: 2px;
+  padding-top: 6px;
+  margin-top: 4px;
+  border-top: 1px solid #2e2e48;
 }
 .q-op-sym {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 .q-op-sym.sub-sym { color: var(--sub); }
 .q-op-sym.mul-sym { color: var(--mul); }
 .q-op-sym.div-sym { color: var(--div); }
 
-.q-second { font-family: var(--font-mono); font-size: 1.1rem; color: var(--text); }
+.q-second {
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+}
 
+/* Answer line — clearly separated, never overlaps */
 .q-ans-line {
   width: 100%;
-  border-top: 2px solid var(--border);
-  padding-top: 4px;
-  margin-top: 2px;
+  border-top: 2.5px solid #2e2e48;
+  padding-top: 8px;
+  margin-top: 8px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   font-weight: 700;
+  min-height: 2.2rem;
+  line-height: 1.3;
 }
-.q-blank { color: var(--border2); letter-spacing: 3px; }
+.q-blank {
+  color: #3a3a5c;
+  letter-spacing: 6px;
+  font-size: 1rem;
+}
 .q-answer { color: var(--green); display: none; }
 .revealed .q-blank { display: none; }
 .revealed .q-answer { display: block; }
-.revealed .q-ans-line { border-top-color: var(--green); }
+.revealed .q-ans-line { border-top-color: #2a6640; }
 
 /* ══════════════════════════════════════
    ADDITION PANEL — NxN grid tables
@@ -435,10 +470,16 @@ html, body {
   flex: 1;
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--border2) transparent;
+  scrollbar-color: #2e2e48 transparent;
 }
 .add-table-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
-.add-table-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.add-table-scroll::-webkit-scrollbar-thumb { background: #2e2e48; border-radius: 4px; }
+
+/* In basic card mode, the q-grid sits directly inside add-table-wrap */
+.add-table-wrap .q-grid {
+  align-content: flex-start;
+  height: auto;
+}
 
 .add-tab-bar {
   display: flex;
@@ -449,20 +490,20 @@ html, body {
 }
 
 .add-tab {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1.5px solid #2e2e48;
   background: transparent;
-  color: var(--muted);
+  color: #555577;
   cursor: pointer;
   transition: all 0.15s;
   font-family: var(--font-mono);
   letter-spacing: 0.5px;
 }
-.add-tab:hover { color: var(--text); border-color: var(--muted); }
-.add-tab.active { color: var(--add); border-color: var(--add); background: var(--add-dim); }
+.add-tab:hover { color: #ffffff; border-color: #9999bb; background: #1a1a28; }
+.add-tab.active { color: var(--add); border-color: var(--add); background: #0a1f1a; }
 
 .add-table-wrap table {
   border-collapse: separate;
@@ -471,54 +512,57 @@ html, body {
   table-layout: fixed;
 }
 .add-table-wrap th {
-  background: var(--card);
+  background: #1a1a28;
   color: var(--add);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 6px 4px;
-  border-radius: 6px;
+  font-size: 0.9rem;
+  padding: 8px 4px;
+  border-radius: 8px;
   text-align: center;
   min-width: 36px;
   font-weight: 700;
+  letter-spacing: 0.5px;
 }
 .add-table-wrap td {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 6px 4px;
+  background: #1a1a28;
+  border: 1.5px solid #2e2e48;
+  border-radius: 8px;
+  padding: 8px 4px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
   min-width: 36px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .add-table-wrap td.total-col {
-  background: var(--add-dim);
+  background: #0a1f1a;
   border-color: var(--add-mid);
   color: var(--add);
   font-weight: 700;
 }
 .add-table-wrap td.total-row {
-  background: #ff6b6b11;
+  background: #1f0d0d;
   border-color: var(--sub-mid);
   color: var(--sub);
   font-weight: 700;
 }
 .add-table-wrap td.total-corner {
-  background: var(--mul-dim);
+  background: #1f1a08;
   border-color: var(--mul-mid);
   color: var(--mul);
   font-weight: 700;
 }
-.ans-span { display: none; color: var(--green); }
-.blank-span { color: var(--border2); letter-spacing: 2px; }
+.ans-span { display: none; color: var(--green); font-weight: 700; }
+.blank-span { color: #3a3a5c; letter-spacing: 2px; font-size: 0.85rem; }
 .add-answers .ans-span { display: inline; }
 .add-answers .blank-span { display: none; }
-.add-answers td { border-color: var(--add-mid); }
-.add-answers td.total-col { border-color: var(--add); }
+.add-answers td { border-color: #1a4030; background: #0d2016; color: var(--green); }
+.add-answers td.total-col { border-color: var(--add); background: #0a2820; }
+.add-answers th { color: #ffffff; }
 
 /* ══════════════════════════════════════
    SIZING: how many cards to show
@@ -799,12 +843,13 @@ let addAnsVisible = false;
 function addGenData(key) {
   const cfg = addSizes.find(s => s.key === key);
   if (cfg.mode === 'basic') {
-    // Row headers and column headers — cells = row + col
-    addData[key] = {
-      mode: 'basic',
-      rowHeaders: Array.from({length: cfg.rows}, () => rand(10, 99)),
-      colHeaders: Array.from({length: cfg.cols}, () => rand(10, 99)),
-    };
+    // Generate pairs: each question is a+b=?
+    const questions = Array.from({length: 30}, () => {
+      const a = rand(10, 99);
+      const b = rand(10, 99);
+      return { a, b, ans: a + b };
+    });
+    addData[key] = { mode: 'basic', questions };
   } else {
     // Pure number grid — just random values to sum across rows and down cols
     const grid = Array.from({length: cfg.n}, () =>
@@ -821,20 +866,30 @@ function addRenderTable(key) {
   let html = '';
 
   if (d.mode === 'basic') {
-    // ── BASIC: row-header × col-header lookup ──
-    const { rowHeaders: rH, colHeaders: cH } = d;
-    html += `<table><thead><tr>`;
-    html += `<th style="color:var(--add);font-size:0.85rem;font-weight:900">＋</th>`;
-    cH.forEach(c => { html += `<th>${c}</th>`; });
-    html += `</tr></thead><tbody>`;
-    rH.forEach(r => {
-      html += `<tr><th>${r}</th>`;
-      cH.forEach(c => {
-        html += `<td><span class="ans-span">${r + c}</span><span class="blank-span">?</span></td>`;
-      });
-      html += `</tr>`;
+    // ── BASIC: individual a+b=? cards ──
+    wrap.innerHTML = '';
+    wrap.className = 'add-table-wrap';
+
+    // Use q-grid card system — same as sub/mul/div
+    html = `<div class="q-grid">`;
+    d.questions.forEach(q => {
+      const revealed = visible ? 'revealed' : '';
+      html += `
+        <div class="q-card ${revealed}" style="min-width:160px">
+          <div class="q-num">${q.a}</div>
+          <div class="q-op-line">
+            <span class="q-op-sym" style="color:var(--add)">+</span>
+            <span class="q-second">${q.b}</span>
+          </div>
+          <div class="q-ans-line">
+            <span class="blank-span q-blank">_ _ _</span>
+            <span class="ans-span q-answer" style="color:var(--add)">${q.ans}</span>
+          </div>
+        </div>`;
     });
-    html += `</tbody></table>`;
+    html += `</div>`;
+    wrap.innerHTML = html;
+    return;
 
   } else {
     // ── NxN GRID: sum rows and cols ──
@@ -861,10 +916,10 @@ function addRenderTable(key) {
     });
     html += `<td class="total-corner"><span class="ans-span">${grand}</span><span class="blank-span">?</span></td></tr>`;
     html += `</tbody></table>`;
-  }
 
-  wrap.innerHTML = html;
-  wrap.className = 'add-table-wrap' + (visible ? ' add-answers' : '');
+    wrap.innerHTML = html;
+    wrap.className = 'add-table-wrap' + (visible ? ' add-answers' : '');
+  }
 }
 
 function addSwitchTab(key) {
@@ -878,7 +933,7 @@ function addSwitchTab(key) {
   const cfg = addSizes.find(s => s.key === key);
   document.getElementById('add-toolbar-sub').textContent =
     cfg.mode === 'basic'
-      ? `Row header + Column header = ?  (10×10 lookup table)`
+      ? `47 + 56 = ?  •  2-digit addition cards`
       : `Sum each row → Total, sum each col → Total  (${cfg.n}×${cfg.n} grid)`;
   if (!addData[key]) addGenData(key);
   addRenderTable(key);
@@ -1058,15 +1113,16 @@ function renderOpGrid(op) {
   const sym = opSymbol(op);
   const symClass = op + '-sym';
 
-  // Dynamic card min-width based on digit count
-  const maxDigits = Math.max(combo.a + combo.b, String(questions[0]?.ans || 0).length);
-  const minW = Math.max(130, maxDigits * 13 + 60);
+  // Dynamic card min-width based on digit count — larger font needs more space
+  const ansLen = String(questions[0]?.ans || 0).length;
+  const maxDigits = Math.max(combo.a, combo.b, ansLen);
+  const minW = Math.max(160, maxDigits * 18 + 80);
 
   let html = `<div class="q-grid">`;
   questions.forEach((q) => {
     const revealed = visible ? 'revealed' : '';
     const decTag = (op === 'div' && q.decimal)
-      ? `<span style="font-size:0.6rem;color:var(--div);opacity:0.7;font-family:var(--font-ui);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px;align-self:flex-start">≈ decimal</span>`
+      ? `<span style="font-size:0.62rem;color:var(--div);font-family:var(--font-ui);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;align-self:flex-start;background:var(--div-dim);padding:2px 7px;border-radius:4px;border:1px solid var(--div-mid)">≈ decimal</span>`
       : '';
     html += `
       <div class="q-card ${revealed}" style="min-width:${minW}px">
@@ -1270,8 +1326,10 @@ function sqRenderGrid() {
     return;
   }
 
-  const maxLen = Math.max(...questions.map(q => String(q.display).length));
-  const minW   = Math.max(120, maxLen * 14 + 60);
+  const maxDisplayLen = Math.max(...questions.map(q => String(q.display).length));
+  const maxAnsLen     = Math.max(...questions.map(q => String(q.ans).length));
+  const maxLen = Math.max(maxDisplayLen, maxAnsLen);
+  const minW   = Math.max(160, maxLen * 18 + 80);
   const colorMap = { sq: 'var(--sq)', cb: 'var(--mul)', sqrt: 'var(--add)', cbrt: 'var(--div)' };
   const color = colorMap[type] || 'var(--sq)';
 
