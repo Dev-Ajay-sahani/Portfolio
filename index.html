@@ -565,11 +565,6 @@ html, body {
 .add-answers th { color: #ffffff; }
 
 /* ══════════════════════════════════════
-   SIZING: how many cards to show
-   Controlled per combination by JS
-══════════════════════════════════════ */
-
-/* ══════════════════════════════════════
    NO CONTENT PLACEHOLDER
 ══════════════════════════════════════ */
 .empty-state {
@@ -583,6 +578,470 @@ html, body {
 }
 .empty-icon { font-size: 3rem; opacity: 0.3; }
 .empty-text { font-size: 0.85rem; font-weight: 500; }
+
+/* ══════════════════════════════════════
+   TABLES TESTING
+══════════════════════════════════════ */
+:root {
+  --tbl: #38bdf8;
+  --tbl-dim: #38bdf822;
+  --tbl-mid: #38bdf855;
+  --chal: #e879f9;
+  --chal-dim: #e879f922;
+  --chal-mid: #e879f955;
+}
+.op-tab.tbl.active { color: var(--tbl); border-bottom-color: var(--tbl); background: #0a1820; }
+.op-tab.chal.active { color: var(--chal); border-bottom-color: var(--chal); background: #1a0a1e; }
+#op-tbl.active, #op-chal.active { display: flex; flex-direction: column; }
+#op-tbl.active > .content-area, #op-chal.active > .content-area { flex: 1; overflow: hidden; }
+
+.tbl-arena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  overflow: hidden;
+}
+.tbl-question-box {
+  background: #1a1a28;
+  border: 2px solid #2e2e48;
+  border-radius: 24px;
+  padding: 32px 48px;
+  text-align: center;
+  min-width: 340px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  transition: border-color 0.3s, transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.tbl-question-box.flash-in {
+  animation: tblFlashIn 0.25s ease-out;
+}
+@keyframes tblFlashIn {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.tbl-q-text {
+  font-family: var(--font-mono);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.tbl-q-eq {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: #3a3a5c;
+  letter-spacing: 3px;
+}
+.tbl-ans-reveal {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--green);
+  display: none;
+}
+.tbl-question-box.show-ans .tbl-q-eq { display: none; }
+.tbl-question-box.show-ans .tbl-ans-reveal { display: block; }
+.tbl-progress-bar {
+  width: 340px;
+  height: 8px;
+  background: #2e2e48;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tbl-progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: var(--tbl);
+  transition: width linear;
+}
+.tbl-progress-fill.danger { background: var(--sub); }
+.tbl-info-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.tbl-count-badge {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted2);
+  padding: 4px 12px;
+  background: #1e1e2a;
+  border: 1px solid #2e2e48;
+  border-radius: 10px;
+}
+.tbl-table-badge {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--tbl);
+  padding: 4px 12px;
+  background: var(--tbl-dim);
+  border: 1px solid var(--tbl-mid);
+  border-radius: 10px;
+}
+.tbl-ctrl-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.tbl-timer-input {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background: #1a1a28;
+  border: 1.5px solid #2e2e48;
+  border-radius: 8px;
+  color: var(--text);
+  padding: 6px 12px;
+  width: 80px;
+  text-align: center;
+}
+.tbl-timer-input:focus { outline: none; border-color: var(--tbl); }
+.tbl-label { font-size: 0.78rem; color: var(--muted2); }
+
+/* ══════════════════════════════════════
+   CHALLENGE MODE
+══════════════════════════════════════ */
+.chal-setup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px 32px;
+  gap: 22px;
+  scrollbar-width: thin;
+  scrollbar-color: #2e2e48 transparent;
+}
+.chal-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.chal-ops-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chal-op-btn {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1.5px solid #2e2e48;
+  background: #1a1a28;
+  color: #9999bb;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
+}
+.chal-op-btn:hover { color: #fff; border-color: #9999bb; }
+.chal-op-btn.active-add  { color: var(--add); border-color: var(--add); background: var(--add-dim); }
+.chal-op-btn.active-sub  { color: var(--sub); border-color: var(--sub); background: var(--sub-dim); }
+.chal-op-btn.active-mul  { color: var(--mul); border-color: var(--mul); background: var(--mul-dim); }
+.chal-op-btn.active-div  { color: var(--div); border-color: var(--div); background: var(--div-dim); }
+.chal-op-btn.active-sq   { color: var(--sq);  border-color: var(--sq);  background: var(--sq-dim);  }
+.chal-op-btn.active-tbl  { color: var(--tbl); border-color: var(--tbl); background: var(--tbl-dim); }
+.chal-op-btn.active-pp   { color: var(--chal);border-color: var(--chal);background: var(--chal-dim); }
+
+.chal-combo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.chal-combo-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 7px;
+  border: 1.5px solid #2e2e48;
+  background: transparent;
+  color: #555577;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.chal-combo-btn:hover { color: #fff; border-color: #9999bb; }
+.chal-combo-btn.sel { color: var(--chal); border-color: var(--chal); background: var(--chal-dim); }
+
+.chal-diff-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.chal-diff-btn {
+  flex: 1;
+  min-width: 90px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #2e2e48;
+  background: #1a1a28;
+  color: #9999bb;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  font-family: var(--font-ui);
+}
+.chal-diff-btn .diff-name { font-size: 0.9rem; font-weight: 700; }
+.chal-diff-btn .diff-time { font-size: 0.72rem; color: var(--muted); margin-top: 3px; font-family: var(--font-mono); }
+.chal-diff-btn:hover { border-color: #9999bb; color: #fff; }
+.chal-diff-btn.sel-easy   { border-color: var(--green); background: #0d2016; color: var(--green); }
+.chal-diff-btn.sel-easy .diff-time { color: var(--green); }
+.chal-diff-btn.sel-medium { border-color: var(--mul); background: #1f1a08; color: var(--mul); }
+.chal-diff-btn.sel-medium .diff-time { color: var(--mul); }
+.chal-diff-btn.sel-hard   { border-color: var(--sub); background: #1f0d0d; color: var(--sub); }
+.chal-diff-btn.sel-hard .diff-time { color: var(--sub); }
+.chal-diff-btn.sel-custom { border-color: var(--tbl); background: var(--tbl-dim); color: var(--tbl); }
+.chal-diff-btn.sel-custom .diff-time { color: var(--tbl); }
+
+.chal-custom-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #14141e;
+  border-radius: 10px;
+  border: 1px solid #2e2e48;
+  display: none;
+}
+.chal-custom-time.show { display: flex; }
+.chal-time-inp {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  background: #1a1a28;
+  border: 1.5px solid #2e2e48;
+  border-radius: 8px;
+  color: var(--text);
+  padding: 6px 12px;
+  width: 90px;
+  text-align: center;
+}
+.chal-time-inp:focus { outline: none; border-color: var(--tbl); }
+.chal-start-btn {
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 13px 36px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #e879f9, #a855f7);
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 24px #e879f940;
+  transition: all 0.18s;
+}
+.chal-start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px #e879f955; }
+.chal-start-btn:active { transform: scale(0.97); }
+
+/* Challenge running screen */
+.chal-run {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+}
+.chal-run.visible { display: flex; }
+.chal-hud {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.chal-hud-pill {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 5px 14px;
+  border-radius: 10px;
+  background: #1e1e2a;
+  border: 1px solid #2e2e48;
+  color: var(--muted2);
+}
+.chal-hud-pill.accent { color: var(--chal); border-color: var(--chal-mid); background: var(--chal-dim); }
+.chal-q-box {
+  background: #1a1a28;
+  border: 2px solid #2e2e48;
+  border-radius: 24px;
+  padding: 32px 52px;
+  text-align: center;
+  min-width: 360px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  transition: border-color 0.2s;
+}
+.chal-q-box.flash-in { animation: tblFlashIn 0.25s ease-out; }
+.chal-q-main {
+  font-family: var(--font-mono);
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  word-break: break-all;
+}
+.chal-q-blank {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: #3a3a5c;
+  letter-spacing: 4px;
+}
+.chal-timer-bar {
+  width: 360px;
+  height: 8px;
+  background: #2e2e48;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.chal-timer-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: var(--chal);
+  transition: width linear;
+}
+.chal-timer-fill.warn { background: var(--mul); }
+.chal-timer-fill.danger { background: var(--sub); }
+.chal-stop-btn {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #2e2e48;
+  background: #1a1a28;
+  color: #9999bb;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chal-stop-btn:hover { color: var(--sub); border-color: var(--sub); }
+
+/* Challenge review screen */
+.chal-review {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chal-review.visible { display: flex; }
+.chal-review-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #222234;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #111118;
+  flex-shrink: 0;
+}
+.chal-review-title { font-size: 1rem; font-weight: 700; color: #fff; flex: 1; }
+.chal-review-score {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 5px 14px;
+  border-radius: 10px;
+  background: var(--chal-dim);
+  border: 1px solid var(--chal-mid);
+  color: var(--chal);
+}
+.chal-review-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.chal-review-card {
+  background: #1a1a28;
+  border: 2px solid #2e2e48;
+  border-radius: 24px;
+  padding: 36px 56px;
+  text-align: center;
+  min-width: 360px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+.chal-review-card.correct { border-color: var(--green); background: #0d2016; }
+.chal-rc-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.chal-rc-q {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+.chal-rc-ans {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--green);
+}
+.chal-rc-label { font-size: 0.72rem; color: var(--muted2); margin-top: 2px; }
+.chal-nav-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 18px;
+}
+.chal-nav-btn {
+  font-family: var(--font-ui);
+  font-size: 1.2rem;
+  font-weight: 700;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1.5px solid #2e2e48;
+  background: #1a1a28;
+  color: #9999bb;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chal-nav-btn:hover { color: var(--chal); border-color: var(--chal); background: var(--chal-dim); }
+.chal-nav-btn:disabled { opacity: 0.3; cursor: default; }
+.chal-nav-btn:disabled:hover { color: #9999bb; border-color: #2e2e48; background: #1a1a28; }
+.chal-nav-pos {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted2);
+  min-width: 60px;
+  text-align: center;
+}
+.chal-replay-btn {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 9px 22px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #e879f9, #a855f7);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 12px #e879f930;
+}
+.chal-replay-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px #e879f950; }
 
 /* ══════════════════════════════════════
    SCROLLBAR GENERAL
@@ -610,6 +1069,8 @@ html, body {
     <button class="op-tab mul" onclick="switchOp('mul')"><span class="op-icon">✖️</span>Multiplication</button>
     <button class="op-tab div" onclick="switchOp('div')"><span class="op-icon">➗</span>Division</button>
     <button class="op-tab sq"  onclick="switchOp('sq')"><span class="op-icon">🔢</span>Roots</button>
+    <button class="op-tab tbl" onclick="switchOp('tbl')"><span class="op-icon">📊</span>Tables</button>
+    <button class="op-tab chal" onclick="switchOp('chal')"><span class="op-icon">⚡</span>Challenge</button>
   </nav>
 
   <!-- ═══════════════ ADDITION PANEL ═══════════════ -->
@@ -744,6 +1205,148 @@ html, body {
     </div>
   </section>
 
+  <!-- ═══════════════ TABLES TESTING PANEL ═══════════════ -->
+  <section class="op-panel" id="op-tbl">
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title">Tables Testing</div>
+          <div class="toolbar-sub" id="tbl-toolbar-sub">Random tables 1–50 · Auto-advance</div>
+        </div>
+        <label class="tbl-label" style="display:flex;align-items:center;gap:8px">
+          Timer (s):
+          <input class="tbl-timer-input" id="tblTimerInput" type="number" value="3" min="1" max="30" step="0.5">
+        </label>
+        <button class="tool-btn" id="tblStartBtn" onclick="tblToggle()" style="color:var(--tbl);border-color:var(--tbl-mid)">▶ Start</button>
+        <button class="tool-btn" onclick="tblReset()" style="color:var(--muted2)">↺ Reset</button>
+      </div>
+      <div class="tbl-arena">
+        <div class="tbl-info-row">
+          <span class="tbl-count-badge" id="tblCountBadge">Q 0 / ∞</span>
+          <span class="tbl-table-badge" id="tblTableBadge">Table: –</span>
+        </div>
+        <div class="tbl-question-box" id="tblQBox">
+          <div class="tbl-q-text" id="tblQText">Press Start</div>
+          <div class="tbl-q-eq" id="tblQEq">— = ?</div>
+          <div class="tbl-ans-reveal" id="tblAnsReveal">–</div>
+        </div>
+        <div class="tbl-progress-bar">
+          <div class="tbl-progress-fill" id="tblProgressFill" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CHALLENGE MODE PANEL ═══════════════ -->
+  <section class="op-panel" id="op-chal">
+    <div class="content-area">
+      <div class="content-toolbar">
+        <div>
+          <div class="toolbar-title">⚡ Challenge Mode</div>
+          <div class="toolbar-sub" id="chalToolbarSub">30 questions · timed · end review</div>
+        </div>
+      </div>
+
+      <!-- SETUP SCREEN -->
+      <div class="chal-setup" id="chalSetup">
+        <!-- Section pick -->
+        <div>
+          <div class="chal-section-title">1 · Choose Section</div>
+          <div class="chal-ops-row" id="chalOpsRow">
+            <button class="chal-op-btn" data-op="add" onclick="chalPickOp('add')">➕ Addition</button>
+            <button class="chal-op-btn" data-op="sub" onclick="chalPickOp('sub')">➖ Subtraction</button>
+            <button class="chal-op-btn" data-op="mul" onclick="chalPickOp('mul')">✖ Multiplication</button>
+            <button class="chal-op-btn" data-op="div" onclick="chalPickOp('div')">➗ Division</button>
+            <button class="chal-op-btn" data-op="sq" onclick="chalPickOp('sq')">🔢 Roots</button>
+            <button class="chal-op-btn" data-op="tbl" onclick="chalPickOp('tbl')">📊 Tables</button>
+            <button class="chal-op-btn" data-op="pp" onclick="chalPickOp('pp')">⚡ Power Play</button>
+          </div>
+        </div>
+        <!-- Combo pick (hidden for tables/pp) -->
+        <div id="chalComboPick">
+          <div class="chal-section-title">2 · Choose Digit Combination</div>
+          <div class="chal-combo-row" id="chalComboRow"></div>
+        </div>
+        <!-- Power Play sub-section (shown for pp) -->
+        <div id="chalPPConfig" style="display:none">
+          <div class="chal-section-title">2 · Power Play Configuration</div>
+          <div class="chal-ops-row">
+            <button class="chal-op-btn active-pp" data-pp="easy" onclick="chalPpDiff('easy')">Easy (2 terms, 2d)</button>
+            <button class="chal-op-btn" data-pp="medium" onclick="chalPpDiff('medium')">Medium (3 terms, 2-3d)</button>
+            <button class="chal-op-btn" data-pp="hard" onclick="chalPpDiff('hard')">Hard (4-5 terms, 3-4d)</button>
+          </div>
+        </div>
+        <!-- Difficulty -->
+        <div>
+          <div class="chal-section-title">3 · Choose Difficulty</div>
+          <div class="chal-diff-row">
+            <div class="chal-diff-btn" id="cdEasy" onclick="chalPickDiff('easy')">
+              <div class="diff-name">🟢 Easy</div>
+              <div class="diff-time">4.5 sec / Q</div>
+            </div>
+            <div class="chal-diff-btn" id="cdMedium" onclick="chalPickDiff('medium')">
+              <div class="diff-name">🟡 Medium</div>
+              <div class="diff-time">3.0 sec / Q</div>
+            </div>
+            <div class="chal-diff-btn" id="cdHard" onclick="chalPickDiff('hard')">
+              <div class="diff-name">🔴 Hard</div>
+              <div class="diff-time">2.3 sec / Q</div>
+            </div>
+            <div class="chal-diff-btn" id="cdCustom" onclick="chalPickDiff('custom')">
+              <div class="diff-name">⚙️ Custom</div>
+              <div class="diff-time" id="cdCustomTime">– sec / Q</div>
+            </div>
+          </div>
+          <div class="chal-custom-time" id="chalCustomRow">
+            <span class="tbl-label">Custom time (sec):</span>
+            <input class="chal-time-inp" id="chalCustomInp" type="number" value="5" min="1" max="60" step="0.5" oninput="chalUpdateCustomLabel()">
+          </div>
+        </div>
+        <button class="chal-start-btn" onclick="chalStart()">⚡ Start Challenge (30 Qs)</button>
+      </div>
+
+      <!-- RUNNING SCREEN -->
+      <div class="chal-run" id="chalRun">
+        <div class="chal-hud">
+          <span class="chal-hud-pill accent" id="chalRunQ">Q 1 / 30</span>
+          <span class="chal-hud-pill" id="chalRunSec">–.– s</span>
+          <span class="chal-hud-pill" id="chalRunOp">–</span>
+        </div>
+        <div class="chal-q-box" id="chalQBox">
+          <div class="chal-q-main" id="chalQMain">…</div>
+          <div class="chal-q-blank">= ?</div>
+        </div>
+        <div class="chal-timer-bar">
+          <div class="chal-timer-fill" id="chalTimerFill" style="width:100%"></div>
+        </div>
+        <button class="chal-stop-btn" onclick="chalStop()">✕ Stop</button>
+      </div>
+
+      <!-- REVIEW SCREEN -->
+      <div class="chal-review" id="chalReview">
+        <div class="chal-review-header">
+          <span class="chal-review-title">📋 Challenge Review — All 30 Questions</span>
+          <span class="chal-review-score" id="chalReviewScore">30 answers</span>
+          <button class="chal-replay-btn" onclick="chalReplay()">↺ New Challenge</button>
+        </div>
+        <div class="chal-review-body">
+          <div class="chal-review-card" id="chalReviewCard">
+            <div class="chal-rc-num" id="chalRcNum">Q 1 of 30</div>
+            <div class="chal-rc-q" id="chalRcQ">–</div>
+            <div class="chal-rc-label">Answer</div>
+            <div class="chal-rc-ans" id="chalRcAns">–</div>
+          </div>
+          <div class="chal-nav-row">
+            <button class="chal-nav-btn" id="chalNavPrev" onclick="chalNavStep(-1)">←</button>
+            <span class="chal-nav-pos" id="chalNavPos">1 / 30</span>
+            <button class="chal-nav-btn" id="chalNavNext" onclick="chalNavStep(1)">→</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </div>
 
 <script>
@@ -839,6 +1442,14 @@ const addSizes = [
 let addCurrent = 'basic';
 let addData = {};
 let addAnsVisible = false;
+
+// Addition digit combinations for Challenge Mode
+const addCombos = [];
+for (let a = 2; a <= 6; a++) {
+  for (let b = 2; b <= a; b++) {
+    addCombos.push({ a, b, key: `${a}x${b}` });
+  }
+}
 
 function addGenData(key) {
   const cfg = addSizes.find(s => s.key === key);
@@ -1235,6 +1846,365 @@ function initOpSidebar(op) {
 }
 
 // ══════════════════════════════════════════════
+// TABLES TESTING
+// ══════════════════════════════════════════════
+let tblRunning = false;
+let tblTimer = null;
+let tblCount = 0;
+let tblCurrentA = 1, tblCurrentB = 1;
+let tblPhase = 'idle'; // 'question' | 'answer' | 'idle'
+let tblRAF = null;
+let tblStartTime = 0;
+let tblDuration = 3000;
+
+function tblGetDuration() {
+  const v = parseFloat(document.getElementById('tblTimerInput').value);
+  return (isNaN(v) || v < 0.5 ? 3 : v) * 1000;
+}
+
+function tblNewQuestion() {
+  tblCount++;
+  tblCurrentA = Math.floor(Math.random() * 50) + 1;
+  tblCurrentB = Math.floor(Math.random() * 12) + 1;
+  const ans = tblCurrentA * tblCurrentB;
+
+  const box = document.getElementById('tblQBox');
+  const qText = document.getElementById('tblQText');
+  const qEq = document.getElementById('tblQEq');
+  const ansEl = document.getElementById('tblAnsReveal');
+  const badge = document.getElementById('tblTableBadge');
+  const countBadge = document.getElementById('tblCountBadge');
+
+  box.classList.remove('show-ans');
+  qText.textContent = `${tblCurrentA} × ${tblCurrentB}`;
+  qEq.textContent = '= ?';
+  ansEl.textContent = ans;
+  badge.textContent = `Table: ${tblCurrentA}`;
+  countBadge.textContent = `Q ${tblCount}`;
+
+  box.classList.remove('flash-in');
+  void box.offsetWidth;
+  box.classList.add('flash-in');
+  document.getElementById('tblToolbarSub') && (document.getElementById('tblToolbarSub').textContent = `Random tables 1–50 · Q ${tblCount}`);
+
+  tblPhase = 'question';
+  tblRunBar(tblGetDuration(), 'question');
+}
+
+function tblRunBar(duration, phase) {
+  const fill = document.getElementById('tblProgressFill');
+  tblStartTime = performance.now();
+  tblDuration = duration;
+
+  if (tblRAF) cancelAnimationFrame(tblRAF);
+
+  function step(now) {
+    if (!tblRunning) return;
+    const elapsed = now - tblStartTime;
+    const pct = Math.max(0, 1 - elapsed / duration);
+    fill.style.width = (pct * 100) + '%';
+    fill.className = 'tbl-progress-fill' + (pct < 0.3 ? ' danger' : '');
+
+    if (elapsed >= duration) {
+      if (phase === 'question') {
+        // Show answer briefly
+        document.getElementById('tblQBox').classList.add('show-ans');
+        tblPhase = 'answer';
+        tblRunBar(1200, 'answer');
+      } else {
+        tblNewQuestion();
+      }
+    } else {
+      tblRAF = requestAnimationFrame(step);
+    }
+  }
+  tblRAF = requestAnimationFrame(step);
+}
+
+function tblToggle() {
+  const btn = document.getElementById('tblStartBtn');
+  if (!tblRunning) {
+    tblRunning = true;
+    btn.textContent = '⏸ Pause';
+    btn.style.color = 'var(--mul)';
+    tblNewQuestion();
+  } else {
+    tblRunning = false;
+    if (tblRAF) cancelAnimationFrame(tblRAF);
+    btn.textContent = '▶ Resume';
+    btn.style.color = 'var(--tbl)';
+  }
+}
+
+function tblReset() {
+  tblRunning = false;
+  tblCount = 0;
+  if (tblRAF) cancelAnimationFrame(tblRAF);
+  const btn = document.getElementById('tblStartBtn');
+  btn.textContent = '▶ Start';
+  btn.style.color = 'var(--tbl)';
+  document.getElementById('tblQBox').classList.remove('show-ans', 'flash-in');
+  document.getElementById('tblQText').textContent = 'Press Start';
+  document.getElementById('tblQEq').textContent = '— = ?';
+  document.getElementById('tblAnsReveal').textContent = '–';
+  document.getElementById('tblCountBadge').textContent = 'Q 0 / ∞';
+  document.getElementById('tblTableBadge').textContent = 'Table: –';
+  document.getElementById('tblProgressFill').style.width = '100%';
+}
+
+// ══════════════════════════════════════════════
+// CHALLENGE MODE
+// ══════════════════════════════════════════════
+const CHAL_TOTAL = 30;
+let chalOp = null;
+let chalComboKey = null;
+let chalDiff = 'medium';
+let chalCustomSec = 5;
+let chalQuestions = [];
+let chalIdx = 0;
+let chalRunning = false;
+let chalRAF = null;
+let chalStartTime = 0;
+let chalTimeSec = 3;
+let chalPpLevel = 'easy';
+let chalReviewIdx = 0;
+
+const CHAL_TIMES = { easy: 4.5, medium: 3.0, hard: 2.3 };
+
+function chalPickOp(op) {
+  chalOp = op;
+  document.querySelectorAll('#chalOpsRow .chal-op-btn').forEach(b => {
+    b.className = 'chal-op-btn';
+    if (b.dataset.op === op) b.className = `chal-op-btn active-${op}`;
+  });
+  const comboPick = document.getElementById('chalComboPick');
+  const ppConfig = document.getElementById('chalPPConfig');
+  if (op === 'tbl' || op === 'pp') {
+    comboPick.style.display = 'none';
+    ppConfig.style.display = op === 'pp' ? '' : 'none';
+    chalComboKey = null;
+  } else {
+    comboPick.style.display = '';
+    ppConfig.style.display = 'none';
+    chalBuildCombos(op);
+  }
+}
+
+function chalBuildCombos(op) {
+  const row = document.getElementById('chalComboRow');
+  row.innerHTML = '';
+  chalComboKey = null;
+  let combos = [];
+  if (op === 'add') combos = addCombos.map(c => ({ key: c.key, label: `${c.a}d+${c.b}d` }));
+  else if (op === 'sub') combos = subCombos.map(c => ({ key: c.key, label: `${c.a}d−${c.b}d` }));
+  else if (op === 'mul') combos = mulCombos.map(c => ({ key: c.key, label: `${c.a}d×${c.b}d` }));
+  else if (op === 'div') combos = divCombos.map(c => ({ key: c.key, label: opBadge('div', c) }));
+  else if (op === 'sq') {
+    const sqModes = ['sq2','sq3','cb2','cb3','sqrt2','sqrt3','sqrt4','cbrt2','cbrt3','cbrt4'];
+    combos = sqModes.map(m => ({ key: m, label: m }));
+  }
+  combos.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'chal-combo-btn';
+    btn.textContent = c.label;
+    btn.dataset.key = c.key;
+    btn.onclick = () => {
+      chalComboKey = c.key;
+      row.querySelectorAll('.chal-combo-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+    };
+    row.appendChild(btn);
+    if (i === 0) { chalComboKey = c.key; btn.classList.add('sel'); }
+  });
+}
+
+function chalPpDiff(level) {
+  chalPpLevel = level;
+  document.querySelectorAll('#chalPPConfig .chal-op-btn').forEach(b => {
+    b.className = 'chal-op-btn';
+    if (b.dataset.pp === level) b.className = 'chal-op-btn active-pp';
+  });
+}
+
+function chalPickDiff(d) {
+  chalDiff = d;
+  ['easy','medium','hard','custom'].forEach(x => {
+    const el = document.getElementById('cd' + x.charAt(0).toUpperCase() + x.slice(1));
+    if (el) el.className = 'chal-diff-btn' + (x === d ? ` sel-${x}` : '');
+  });
+  document.getElementById('chalCustomRow').className = 'chal-custom-time' + (d === 'custom' ? ' show' : '');
+}
+
+function chalUpdateCustomLabel() {
+  const v = parseFloat(document.getElementById('chalCustomInp').value);
+  document.getElementById('cdCustomTime').textContent = (isNaN(v) ? '–' : v) + ' sec / Q';
+}
+
+function chalGetTime() {
+  if (chalDiff === 'custom') {
+    const v = parseFloat(document.getElementById('chalCustomInp').value);
+    return isNaN(v) || v < 0.5 ? 5 : v;
+  }
+  return CHAL_TIMES[chalDiff] || 3;
+}
+
+function chalGenQuestion() {
+  if (chalOp === 'tbl') {
+    const a = Math.floor(Math.random() * 50) + 1;
+    const b = Math.floor(Math.random() * 12) + 1;
+    return { q: `${a} × ${b}`, ans: a * b };
+  }
+  if (chalOp === 'pp') {
+    return chalGenPowerPlay();
+  }
+  if (chalOp === 'add') {
+    const combo = addCombos.find(c => c.key === (chalComboKey || addCombos[0].key));
+    const top = randNDigit(combo.a);
+    const bot = randNDigit(combo.b);
+    return { q: `${top} + ${bot}`, ans: top + bot };
+  }
+  if (chalOp === 'sub' || chalOp === 'mul' || chalOp === 'div') {
+    const state = opState[chalOp];
+    const combo = state.combos.find(c => c.key === (chalComboKey || state.combos[0].key));
+    const q = genQuestion(chalOp, combo);
+    const symMap = { sub: '−', mul: '×', div: '÷' };
+    return { q: `${q.a} ${symMap[chalOp]} ${q.b}`, ans: q.ans };
+  }
+  if (chalOp === 'sq') {
+    const mode = chalComboKey || 'sq2';
+    if (!sqData[mode]) sqGenData(mode);
+    const pool = sqData[mode].questions;
+    if (!pool || pool.length === 0) return { q: '?', ans: 0 };
+    const item = pool[Math.floor(Math.random() * pool.length)];
+    const type = sqData[mode].type;
+    const symMap = { sq: '²', cb: '³', sqrt: '√', cbrt: '∛' };
+    if (type === 'sq' || type === 'cb') return { q: `${item.display}${symMap[type]}`, ans: item.ans };
+    return { q: `${symMap[type]}${item.display}`, ans: item.ans };
+  }
+  return { q: '?', ans: 0 };
+}
+
+function chalGenPowerPlay() {
+  let terms = 2, minD = 2, maxD = 2;
+  if (chalPpLevel === 'medium') { terms = 3; minD = 2; maxD = 3; }
+  if (chalPpLevel === 'hard')   { terms = Math.floor(Math.random() * 2) + 4; minD = 3; maxD = 4; }
+  const nums = Array.from({ length: terms }, () => {
+    const d = minD + Math.floor(Math.random() * (maxD - minD + 1));
+    return randNDigit(d);
+  });
+  const total = nums.reduce((a, b) => a + b, 0);
+  return { q: nums.join(' + '), ans: total };
+}
+
+function chalStart() {
+  if (!chalOp) { alert('Please choose a section first!'); return; }
+  // Generate 30 questions
+  chalQuestions = Array.from({ length: CHAL_TOTAL }, () => chalGenQuestion());
+  chalIdx = 0;
+  chalTimeSec = chalGetTime();
+
+  document.getElementById('chalSetup').style.display = 'none';
+  document.getElementById('chalReview').className = 'chal-review';
+  const run = document.getElementById('chalRun');
+  run.className = 'chal-run visible';
+  const opLabel = {
+    add:'Addition', sub:'Subtraction', mul:'Multiplication',
+    div:'Division', sq:'Roots', tbl:'Tables', pp:'Power Play'
+  }[chalOp];
+  document.getElementById('chalRunOp').textContent = opLabel;
+  document.getElementById('chalToolbarSub').textContent = `${opLabel} · ${chalTimeSec}s / Q · ${CHAL_TOTAL} Qs`;
+  chalRunning = true;
+  chalShowQ();
+}
+
+function chalShowQ() {
+  if (chalIdx >= CHAL_TOTAL) { chalFinish(); return; }
+  const q = chalQuestions[chalIdx];
+  document.getElementById('chalRunQ').textContent = `Q ${chalIdx + 1} / ${CHAL_TOTAL}`;
+  document.getElementById('chalQMain').textContent = q.q;
+  const box = document.getElementById('chalQBox');
+  box.classList.remove('flash-in');
+  void box.offsetWidth;
+  box.classList.add('flash-in');
+  chalRunTimer();
+}
+
+function chalRunTimer() {
+  chalStartTime = performance.now();
+  const duration = chalTimeSec * 1000;
+  const fill = document.getElementById('chalTimerFill');
+  const secEl = document.getElementById('chalRunSec');
+  if (chalRAF) cancelAnimationFrame(chalRAF);
+
+  function step(now) {
+    if (!chalRunning) return;
+    const elapsed = now - chalStartTime;
+    const pct = Math.max(0, 1 - elapsed / duration);
+    const remSec = Math.max(0, chalTimeSec - elapsed / 1000).toFixed(1);
+    fill.style.width = (pct * 100) + '%';
+    fill.className = 'chal-timer-fill' + (pct < 0.25 ? ' danger' : pct < 0.5 ? ' warn' : '');
+    secEl.textContent = remSec + ' s';
+    if (elapsed >= duration) {
+      chalIdx++;
+      chalShowQ();
+    } else {
+      chalRAF = requestAnimationFrame(step);
+    }
+  }
+  chalRAF = requestAnimationFrame(step);
+}
+
+function chalStop() {
+  chalRunning = false;
+  if (chalRAF) cancelAnimationFrame(chalRAF);
+  document.getElementById('chalRun').className = 'chal-run';
+  document.getElementById('chalSetup').style.display = '';
+  document.getElementById('chalToolbarSub').textContent = '30 questions · timed · end review';
+}
+
+function chalFinish() {
+  chalRunning = false;
+  if (chalRAF) cancelAnimationFrame(chalRAF);
+  document.getElementById('chalRun').className = 'chal-run';
+  chalReviewIdx = 0;
+  document.getElementById('chalReviewScore').textContent = `${CHAL_TOTAL} answers`;
+  const review = document.getElementById('chalReview');
+  review.className = 'chal-review visible';
+  chalShowReviewCard();
+}
+
+function chalShowReviewCard() {
+  const i = chalReviewIdx;
+  const q = chalQuestions[i];
+  document.getElementById('chalRcNum').textContent = `Q ${i + 1} of ${CHAL_TOTAL}`;
+  document.getElementById('chalRcQ').textContent = q.q;
+  document.getElementById('chalRcAns').textContent = q.ans;
+  document.getElementById('chalNavPos').textContent = `${i + 1} / ${CHAL_TOTAL}`;
+  document.getElementById('chalNavPrev').disabled = i === 0;
+  document.getElementById('chalNavNext').disabled = i === CHAL_TOTAL - 1;
+}
+
+function chalNavStep(dir) {
+  chalReviewIdx = Math.max(0, Math.min(CHAL_TOTAL - 1, chalReviewIdx + dir));
+  const card = document.getElementById('chalReviewCard');
+  card.classList.remove('flash-in');
+  void card.offsetWidth;
+  card.classList.add('flash-in');
+  chalShowReviewCard();
+}
+
+function chalReplay() {
+  document.getElementById('chalReview').className = 'chal-review';
+  document.getElementById('chalSetup').style.display = '';
+  document.getElementById('chalToolbarSub').textContent = '30 questions · timed · end review';
+  chalOp = null;
+  chalComboKey = null;
+  document.querySelectorAll('#chalOpsRow .chal-op-btn').forEach(b => b.className = 'chal-op-btn');
+  document.getElementById('chalComboPick').style.display = 'none';
+  document.getElementById('chalPPConfig').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
@@ -1243,6 +2213,11 @@ window.addEventListener('DOMContentLoaded', () => {
   initOpSidebar('mul');
   initOpSidebar('div');
   sqInit();
+  // Challenge mode: hide combo pick initially
+  document.getElementById('chalComboPick').style.display = 'none';
+  document.getElementById('chalPPConfig').style.display = 'none';
+  // Default difficulty highlight
+  chalPickDiff('medium');
 });
 
 // ══════════════════════════════════════════════
